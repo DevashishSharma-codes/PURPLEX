@@ -1,11 +1,11 @@
 import dotenv from "dotenv";
 import connectDB from "./src/config/db.js";
 import app from "./src/app.js";
-
+import { generateResponse } from "./src/services/ai.service.js";
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
-
+generateResponse();
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
