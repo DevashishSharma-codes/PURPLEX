@@ -1,16 +1,16 @@
 import { createBrowserRouter } from 'react-router-dom';
 import Login from '@/features/auth/pages/Login.jsx';
 import Register from '@/features/auth/pages/Register.jsx';
-import Dashboard from '@/features/chat/pages/Dashboard';
 import Protected from '@/features/auth/components/Protected';
+import Landing from '@/features/chat/pages/Landing.jsx';
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: 
-    <Protected>
-      <Dashboard />
-    </Protected>
+
+     <Landing></Landing>
+
   },
   {
     path: "/login",
