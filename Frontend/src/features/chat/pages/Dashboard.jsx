@@ -1,492 +1,418 @@
 import { useState, useRef, useEffect } from "react";
 
-const CYAN = "#00d8ed";
-const CYAN_SOFT = "rgba(0,216,237,0.48)";
-const ACCENT = "#c8501a";
-const BG = "#070808";
-const PANEL = "#0d0e0f";
-const GRID = "rgba(255,255,255,0.012)";
-const TEXT_PRIMARY = "#e8dcc8";
-const TEXT_SECONDARY = "rgba(232,220,200,0.5)";
-const TEXT_MUTED = "rgba(232,220,200,0.28)";
-const BORDER = "rgba(255,255,255,0.07)";
-const BORDER_SOFT = "rgba(255,255,255,0.04)";
-const ACCENT_SOFT = "rgba(200,80,26,0.08)";
-const ACCENT_BORDER = "rgba(200,80,26,0.25)";
-const LINE = "rgba(255,255,255,0.12)";
-
 const GLOBAL_CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Geist:wght@300;400;500;600&display=swap');
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; background: ${BG}; }
+html, body { height: 100%; overflow: hidden; }
+
+:root {
+  --ink: #0f0d0b;
+  --ink2: #3a3530;
+  --ink3: #857e76;
+  --paper: #f2ece0;
+  --paper2: #ebe3d4;
+  --paper3: #e1d8c6;
+  --dash: rgba(15,13,11,0.16);
+  --accent: #c8501a;
+  --accent-soft: rgba(200,80,26,0.07);
+  --accent-border: rgba(200,80,26,0.2);
+  --hatch-color: rgba(15,13,11,0.13);
+  --hatch-size: 12px;
+}
+
+.px-root {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(ellipse 1100px 700px at -5% -10%, rgba(230,140,80,0.28) 0%, transparent 55%),
+    radial-gradient(ellipse 800px 600px at 105% 110%, rgba(180,140,220,0.18) 0%, transparent 50%);
+}
 
 @keyframes bpulse  { 0%,100%{opacity:1} 50%{opacity:.3} }
-@keyframes blink   { 0%,100%{opacity:1} 50%{opacity:0} }
-@keyframes fadeIn  { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 @keyframes fadeUp  { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-@keyframes tdot    { 0%,80%,100%{transform:scale(.7);opacity:.4} 40%{transform:scale(1);opacity:1} }
-
-@keyframes beamVertical {
-  0%   { top: -110px; opacity: 0; }
-  5%   { opacity: 1; }
-  95%  { top: 100%; opacity: 1; }
-  100% { top: 100%; opacity: 0; }
-}
-@keyframes beamHLeft {
-  0%   { left: 100%;  opacity: 0; }
-  5%   { opacity: 1; }
-  95%  { left: -80px; opacity: 1; }
-  100% { left: -80px; opacity: 0; }
-}
-@keyframes beamHRight {
-  0%   { left: -80px; opacity: 0; }
-  5%   { opacity: 1; }
-  95%  { left: 100%;  opacity: 1; }
-  100% { left: 100%;  opacity: 0; }
-}
-
-/* ── SCROLLBARS ── */
-.px-sidebar-chats::-webkit-scrollbar { width: 2px; }
-.px-sidebar-chats::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
-.px-chat-area::-webkit-scrollbar { width: 3px; }
-.px-chat-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.07); border-radius: 2px; }
+@keyframes tdot    { 0%,80%,100%{transform:scale(.65);opacity:.3} 40%{transform:scale(1);opacity:1} }
+@keyframes slideIn { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
 
 /* ── SIDEBAR ── */
 .px-sidebar {
-  width: 240px; flex-shrink: 0;
-  background: ${PANEL};
-  border-right: 1px solid ${BORDER_SOFT};
+  width: 236px; flex-shrink: 0;
+  background: rgba(242,236,224,0.92);
+  border-right: 1px dashed var(--dash);
   display: flex; flex-direction: column;
-  height: 100%; position: relative; z-index: 10; overflow: hidden;
-}
-.px-sidebar::after {
-  content: '';
-  position: absolute; right: 0; top: 0; bottom: 0; width: 1px;
-  background: linear-gradient(180deg, rgba(200,80,26,0.3), rgba(200,80,26,0.06) 14%, transparent 40%);
-  pointer-events: none;
+  height: 100%; overflow: hidden;
+  position: relative; z-index: 10;
 }
 .px-sidebar-logo {
-  padding: 1.1rem 1.25rem 0.9rem;
-  border-bottom: 1px solid ${BORDER_SOFT};
-  display: flex; align-items: center; gap: 9px; cursor: pointer; flex-shrink: 0;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px dashed var(--dash);
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; flex-shrink: 0;
 }
 .px-logo-mark {
-  width: 22px; height: 22px; border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.18);
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 1.5px dashed var(--dash);
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Geist', sans-serif; font-size: 0.6rem; font-weight: 600;
-  color: ${TEXT_PRIMARY}; flex-shrink: 0;
+  font-family: 'Libre Baskerville', serif; font-size: 0.62rem; font-weight: 700;
+  color: var(--ink2); flex-shrink: 0;
 }
-.px-logo-text {
-  font-family: 'Libre Baskerville', serif;
-  font-size: 1.05rem; color: ${TEXT_PRIMARY}; letter-spacing: -0.02em;
-}
+.px-logo-text { font-family: 'Libre Baskerville', serif; font-size: 1.05rem; color: var(--ink); letter-spacing: -0.02em; }
+
 .px-new-chat-btn {
-  display: flex; align-items: center; gap: 9px; width: 100%;
-  padding: 0.55rem 0.8rem;
-  background: ${ACCENT_SOFT}; border: 1px solid ${ACCENT_BORDER};
-  border-radius: 6px; cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-  color: rgba(200,80,26,0.9);
-  font-family: 'Geist', sans-serif; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.03em;
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: var(--accent-soft); border: 1px dashed var(--accent-border);
+  cursor: pointer; color: var(--accent);
+  font-family: 'Geist', sans-serif; font-size: 0.72rem; font-weight: 500;
+  letter-spacing: 0.03em; transition: background 0.15s;
+  flex-shrink: 0;
 }
-.px-new-chat-btn:hover { background: rgba(200,80,26,0.16); border-color: rgba(200,80,26,0.4); }
+.px-new-chat-btn:hover { background: rgba(200,80,26,0.13); }
+
 .px-section-label {
-  font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase;
-  color: ${TEXT_MUTED}; padding: 0.75rem 1.1rem 0.35rem;
-  font-family: 'Geist', sans-serif;
+  font-size: 0.57rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink3); padding: 0.65rem 1.1rem 0.3rem;
+  font-family: 'Geist', sans-serif; flex-shrink: 0;
 }
-.px-sidebar-chats { flex: 1; overflow-y: auto; padding-bottom: 0.5rem; }
+.px-sidebar-chats { flex: 1; overflow-y: auto; min-height: 0; }
+.px-sidebar-chats::-webkit-scrollbar { width: 2px; }
+.px-sidebar-chats::-webkit-scrollbar-thumb { background: var(--dash); border-radius: 2px; }
+
 .px-chat-item {
   display: flex; align-items: center; gap: 8px;
-  padding: 0.45rem 1.1rem; cursor: pointer;
+  padding: 0.42rem 1.1rem; cursor: pointer;
+  border-bottom: 1px dashed rgba(15,13,11,0.06);
   transition: background 0.12s; position: relative;
 }
-.px-chat-item:hover { background: rgba(255,255,255,0.035); }
-.px-chat-item.active { background: rgba(200,80,26,0.08); }
+.px-chat-item:hover { background: rgba(15,13,11,0.03); }
+.px-chat-item.active { background: var(--accent-soft); }
 .px-chat-item.active::before {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: ${ACCENT};
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 2px; background: var(--accent);
 }
-.px-chat-dot { width: 4px; height: 4px; border-radius: 50%; background: ${TEXT_MUTED}; flex-shrink: 0; margin-top: 1px; }
-.px-chat-item.active .px-chat-dot { background: ${ACCENT}; }
+.px-chat-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--ink3); flex-shrink: 0; }
+.px-chat-item.active .px-chat-dot { background: var(--accent); }
 .px-chat-title {
-  font-size: 0.74rem; color: ${TEXT_SECONDARY};
+  font-size: 0.72rem; color: var(--ink2);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  font-weight: 300; line-height: 1.35; flex: 1; min-width: 0;
+  font-weight: 300; line-height: 1.4; flex: 1; min-width: 0;
+  font-family: 'Geist', sans-serif;
 }
-.px-chat-item.active .px-chat-title { color: rgba(200,80,26,0.88); font-weight: 400; }
-.px-chat-time { font-size: 0.58rem; color: ${TEXT_MUTED}; flex-shrink: 0; }
-.px-sidebar-divider { border: none; border-top: 1px dashed rgba(255,255,255,0.06); margin: 0 0.85rem 0.25rem; }
+.px-chat-item.active .px-chat-title { color: var(--accent); font-weight: 500; }
+.px-chat-time { font-size: 0.57rem; color: var(--ink3); flex-shrink: 0; }
+
 .px-sidebar-bottom {
-  border-top: 1px solid ${BORDER_SOFT}; padding: 0.75rem 0.85rem;
-  display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;
+  border-top: 1px dashed var(--dash); padding: 0.65rem 0.75rem;
+  display: flex; flex-direction: column; gap: 1px; flex-shrink: 0;
 }
 .px-sidebar-btn {
-  display: flex; align-items: center; gap: 9px;
-  padding: 0.45rem 0.6rem; border-radius: 5px; cursor: pointer;
-  transition: background 0.12s, color 0.12s;
-  color: ${TEXT_MUTED}; font-size: 0.72rem;
+  display: flex; align-items: center; gap: 8px;
+  padding: 0.4rem 0.55rem; cursor: pointer;
+  color: var(--ink3); font-size: 0.71rem;
   font-family: 'Geist', sans-serif; font-weight: 300;
   background: none; border: none; width: 100%; text-align: left;
+  transition: background 0.12s, color 0.12s;
 }
-.px-sidebar-btn:hover { background: rgba(255,255,255,0.035); color: ${TEXT_SECONDARY}; }
-.px-sidebar-btn.danger { color: rgba(200,80,26,0.5); }
-.px-sidebar-btn.danger:hover { color: rgba(200,80,26,0.8); }
+.px-sidebar-btn:hover { background: rgba(15,13,11,0.04); color: var(--ink2); }
+.px-sidebar-btn.danger:hover { color: var(--accent); background: var(--accent-soft); }
 
-/* ── MAIN ── */
-.px-main {
-  flex: 1; display: flex; flex-direction: column; min-width: 0;
-  position: relative; overflow: hidden;
+/* ═══════════════════════════════════════
+   HATCH WRAPPER — padding approach
+   Padding on the wrapper reveals the hatch
+   bg behind the inner content box.
+═══════════════════════════════════════ */
+.px-main-wrapper {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 14px;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--hatch-color) 0px,
+    var(--hatch-color) 1px,
+    transparent 1px,
+    transparent var(--hatch-size)
+  );
+  background-color: var(--paper);
+}
+
+/* Inner content box sits on top — fills the padded space */
+.px-main-inner {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(ellipse 900px 600px at 10% 0%, rgba(230,140,80,0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 700px 500px at 90% 100%, rgba(180,140,220,0.10) 0%, transparent 50%);
+  outline: 1px solid rgba(15,13,11,0.12);
 }
 
 /* ── TOPBAR ── */
 .px-topbar {
-  height: 54px; border-bottom: 1px solid ${BORDER_SOFT};
+  height: 52px; flex-shrink: 0;
+  border-bottom: 1px dashed var(--dash);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 1.5rem;
-  background: rgba(7,8,8,0.85); backdrop-filter: blur(12px);
-  flex-shrink: 0; position: relative; z-index: 20;
+  background: rgba(242,236,224,0.88);
 }
 .px-topbar-title {
   font-family: 'Libre Baskerville', serif; font-size: 0.88rem;
-  color: ${TEXT_SECONDARY}; font-style: italic; letter-spacing: -0.01em;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 400px;
+  color: var(--ink3); font-style: italic; letter-spacing: -0.01em;
 }
-.px-topbar-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
-.px-mode-toggle { display: flex; border: 1px solid ${BORDER}; border-radius: 5px; overflow: hidden; }
+.px-topbar-actions { display: flex; align-items: center; gap: 0.5rem; }
+
+.px-mode-toggle { display: flex; border: 1px dashed var(--dash); overflow: hidden; }
 .px-mode-btn {
-  padding: 0.28rem 0.7rem; font-size: 0.65rem;
+  padding: 0.28rem 0.72rem; font-size: 0.63rem;
   font-family: 'Geist', sans-serif; font-weight: 400; letter-spacing: 0.04em;
-  background: none; border: none; cursor: pointer; color: ${TEXT_MUTED};
+  background: none; border: none; cursor: pointer; color: var(--ink3);
   transition: background 0.15s, color 0.15s;
+  border-right: 1px dashed var(--dash);
 }
-.px-mode-btn.active { background: rgba(255,255,255,0.06); color: ${TEXT_PRIMARY}; }
+.px-mode-btn:last-child { border-right: none; }
+.px-mode-btn.active { background: var(--ink); color: #f5f0e8; }
+
 .px-live-badge {
   display: inline-flex; align-items: center; gap: 6px;
-  background: ${ACCENT_SOFT}; border: 1px solid ${ACCENT_BORDER};
-  border-radius: 999px; padding: 0.25rem 0.75rem;
-  font-size: 0.62rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
-  color: rgba(200,80,26,0.85);
+  background: var(--accent-soft); border: 1px dashed var(--accent-border);
+  padding: 0.22rem 0.75rem;
+  font-size: 0.6rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--accent); font-family: 'Geist', sans-serif;
 }
-.px-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: ${ACCENT}; animation: bpulse 2s infinite; flex-shrink: 0; }
+.px-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: bpulse 2s infinite; flex-shrink: 0; }
+
 .px-topbar-icon-btn {
-  width: 32px; height: 32px; border: 1px solid ${BORDER}; background: none;
+  width: 30px; height: 30px; border: 1px dashed var(--dash); background: none;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; border-radius: 5px; color: ${TEXT_MUTED};
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  cursor: pointer; color: var(--ink3); transition: background 0.15s, color 0.15s;
 }
-.px-topbar-icon-btn:hover { background: rgba(255,255,255,0.035); color: ${TEXT_SECONDARY}; }
+.px-topbar-icon-btn:hover { background: rgba(15,13,11,0.05); color: var(--ink2); }
 
-/* ── HERO / WELCOME SCREEN (original Kreona layout) ── */
+/* ── HERO SCREEN ── */
 .px-hero-screen {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background:
-    linear-gradient(${GRID} 1px, transparent 1px),
-    linear-gradient(90deg, ${GRID} 1px, transparent 1px),
-    radial-gradient(circle at 50% 9%, rgba(255,255,255,0.035), transparent 25%),
-    ${BG};
-  background-size: 24px 24px, 24px 24px, auto, auto;
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column; align-items: center;
+  overflow: hidden; position: relative;
+}
+.px-hero-rails { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.px-rail {
+  position: absolute; top: 0; bottom: 0; width: 1px;
+  background: linear-gradient(180deg,
+    rgba(200,80,26,0.4) 0%, rgba(200,80,26,0.08) 20%,
+    rgba(15,13,11,0.06) 50%, transparent 100%);
+}
+.px-rail-l { left: 72px; }
+.px-rail-r { right: 72px; }
+.px-hero-hline2 {
+  position: absolute; left: 72px; right: 72px; bottom: 80px;
+  height: 1px; background: var(--dash); pointer-events: none; z-index: 1;
 }
 
-/* vertical rail lines */
-.px-hero-screen::before, .px-hero-screen::after {
-  content: ''; position: absolute; top: 0; bottom: 0; width: 1px;
-  background: linear-gradient(180deg, rgba(0,216,237,0.4), rgba(0,216,237,0.05) 14%, transparent 45%);
-  pointer-events: none; z-index: 1;
-}
-.px-hero-screen::before { left: 58px; }
-.px-hero-screen::after  { right: 58px; }
-
-/* beam animations */
-.px-beam-v {
-  position: absolute; width: 1px; height: 110px; pointer-events: none; z-index: 10;
-  top: -110px; animation: beamVertical 3.5s cubic-bezier(0.4,0,0.6,1) infinite;
-  background: linear-gradient(180deg, transparent 0%, ${CYAN} 50%, transparent 100%);
-}
-.px-beam-vl { left: 58px; }
-.px-beam-vr { right: 58px; }
-.px-beam-h {
-  position: absolute; height: 2px; width: 80px; pointer-events: none; z-index: 10; top: -1px;
-}
-.px-beam-hl {
-  animation: beamHLeft 3.5s cubic-bezier(0.4,0,0.6,1) infinite;
-  background: linear-gradient(90deg, transparent 0%, ${CYAN} 50%, transparent 100%);
-}
-.px-beam-hr {
-  animation: beamHRight 3.5s cubic-bezier(0.4,0,0.6,1) infinite;
-  background: linear-gradient(90deg, transparent 0%, ${CYAN} 50%, transparent 100%);
-}
-
-/* hero text */
 .px-hero-section {
   position: relative; z-index: 2;
   display: flex; flex-direction: column; align-items: center;
-  padding-top: 42px; text-align: center;
-  animation: fadeIn 0.8s ease both;
+  padding-top: 44px; text-align: center;
+  animation: fadeUp 0.75s ease both;
 }
+.px-hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 7px;
+  border: 1px dashed var(--dash); padding: 0.25rem 0.85rem;
+  font-size: 0.65rem; font-weight: 400; letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--ink3); font-family: 'Geist', sans-serif;
+  margin-bottom: 1.4rem; background: rgba(242,236,224,0.6);
+}
+.px-eyebrow-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: bpulse 2s infinite; }
 .px-hero-title {
   font-family: 'Libre Baskerville', serif;
-  font-size: clamp(3.2rem, 6.5vw, 5.4rem);
-  font-weight: 400; line-height: 0.99; letter-spacing: -0.03em;
-  color: transparent;
-  background: linear-gradient(90deg, #eeeeef 0%, #b8b8bb 47%, #5d5d61 82%, rgba(75,75,79,0.45) 100%);
-  -webkit-background-clip: text; background-clip: text;
+  font-size: clamp(2.8rem, 5vw, 4.6rem);
+  font-weight: 400; line-height: 1.05; letter-spacing: -0.03em; color: var(--ink);
 }
+.px-hero-title em { font-style: italic; color: var(--ink3); }
 .px-hero-sub {
-  margin-top: 22px; max-width: 640px;
-  color: rgba(232,220,200,0.55); font-size: 1rem;
-  font-family: 'Geist', sans-serif; font-weight: 300; line-height: 1.5;
-  padding: 0 18px;
-  animation: fadeIn 0.8s ease 0.2s both;
+  margin-top: 1.1rem; max-width: 500px;
+  color: var(--ink3); font-size: 0.9rem;
+  font-family: 'Geist', sans-serif; font-weight: 300; line-height: 1.75;
+  padding: 0 1rem; animation: fadeUp 0.75s ease 0.15s both;
 }
 
-/* stage area */
-.px-stage {
-  position: relative; z-index: 2;
-  width: min(100%, 1200px);
-  height: 460px;
-  margin: 50px auto 0;
-  animation: fadeIn 0.8s ease 0.4s both;
+/* ── COMPOSER FRAME ── */
+.px-composer-frame {
+  position: relative; z-index: 3;
+  width: min(100% - 144px, 760px);
+  margin: 2.5rem auto 0;
+  animation: fadeUp 0.75s ease 0.3s both;
+  border: 1px dashed var(--dash);
+  padding: 1px; background: var(--paper2);
 }
-/* cyan rule */
-.px-cyan-rule {
-  position: absolute; left: 0; right: 0; top: 29px; height: 1px;
-  background: linear-gradient(90deg, rgba(0,216,237,0.48), transparent 16%, transparent 84%, rgba(0,216,237,0.48));
-  overflow: visible;
+.px-composer-frame::before {
+  content: ''; position: absolute; inset: 6px;
+  border: 1px dashed rgba(15,13,11,0.08);
+  pointer-events: none; z-index: 0;
 }
-/* CTA row */
-.px-cta-row {
-  position: absolute; top: 0; left: 0; right: 0;
-  display: flex; align-items: center;
+.px-mac-bar {
+  display: flex; align-items: center; gap: 7px;
+  padding: 0.55rem 0.9rem;
+  background: var(--paper3); border-bottom: 1px dashed var(--dash);
+  position: relative; z-index: 1;
 }
-.px-cta-line-l {
-  height: 1px; flex: 1;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.11));
-  position: relative; overflow: hidden;
+.px-mac-dot { width: 10px; height: 10px; border-radius: 50%; }
+.px-mac-filename {
+  font-family: 'Geist', monospace; font-size: 0.65rem;
+  color: var(--ink3); margin-left: auto; margin-right: auto;
 }
-.px-cta-line-r {
-  height: 1px; flex: 1;
-  background: linear-gradient(90deg, rgba(255,255,255,0.11), transparent);
-  position: relative; overflow: hidden;
-}
-.px-cta-btn {
-  width: 220px; height: 55px;
-  border: 2px solid rgba(255,255,255,0.94); background: #090a0a;
-  color: #fff; cursor: pointer; font-size: 14px; font-weight: 700;
-  letter-spacing: 0.04em;
-  font-family: 'Geist', sans-serif;
-  transition: border-color 160ms, color 160ms;
-  white-space: nowrap;
-}
-.px-cta-btn:hover { border-color: ${CYAN}; color: ${CYAN}; }
-
-/* command frame lines */
-.px-frame-line-h {
-  position: absolute; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1) 10%, rgba(255,255,255,0.1) 90%, transparent);
-}
-
-/* feature icons in corners */
-.px-feat {
-  position: absolute; z-index: 2; width: 90px; text-align: center;
-  color: rgba(146,147,154,0.6);
-  font-family: ui-monospace, Menlo, monospace; font-size: 11px;
-}
-.px-feat-icon {
-  width: 64px; height: 64px;
-  display: grid; place-items: center;
-  border: 1px solid rgba(255,255,255,0.09);
-  background: rgba(255,255,255,0.035);
-  margin: 0 auto 11px;
-}
-
-/* composer */
-.px-composer-stage {
-  position: absolute; z-index: 3;
-  left: 170px; right: 170px; top: 128px;
-  height: 210px;
-  border: 1px solid rgba(255,255,255,0.17);
-  background: #101113; padding: 8px;
-}
+.px-frame-body { background: var(--paper2); position: relative; z-index: 1; }
 .px-stage-textarea {
-  display: block; width: 100%; height: 140px; resize: none; outline: none;
-  border: 1px solid rgba(255,255,255,0.11);
-  background: #18191c; color: #c6c9d6;
-  padding: 20px 22px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 13px; line-height: 1.5;
+  display: block; width: 100%; resize: none; outline: none; border: none;
+  background: transparent; color: var(--ink2);
+  padding: 1.2rem 1.4rem 0.8rem;
+  font-family: 'Geist', monospace; font-size: 0.82rem; line-height: 1.75;
+  height: 126px;
 }
-.px-stage-textarea::placeholder { color: #535966; }
-.px-stage-footer {
-  height: 55px; display: flex; align-items: center; gap: 10px;
+.px-stage-textarea::placeholder { color: var(--ink3); opacity: 0.55; }
+.px-frame-footer {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0.55rem 0.9rem;
+  border-top: 1px dashed var(--dash); background: var(--paper3);
 }
-.px-stage-icon-btn {
-  width: 38px; height: 38px; display: grid; place-items: center;
-  border: 1px solid rgba(255,255,255,0.13); background: #18191c; color: ${CYAN};
-  cursor: pointer; transition: border-color 150ms, background 150ms;
+.px-frame-tag {
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'Geist', monospace; font-size: 0.63rem;
+  color: var(--ink3); border: 1px dashed var(--dash);
+  padding: 0.2rem 0.55rem; cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
 }
-.px-stage-icon-btn:hover { border-color: rgba(0,216,237,0.55); background: rgba(0,216,237,0.08); }
-.px-stage-search-btn {
-  height: 38px; min-width: 160px; display: flex; align-items: center; gap: 9px; padding: 0 14px;
-  border: 1px solid rgba(255,255,255,0.13); background: #18191c; color: ${CYAN};
-  font-family: ui-monospace, Menlo, monospace; font-size: 12px;
-  cursor: pointer; transition: border-color 150ms, background 150ms;
+.px-frame-tag:hover { border-color: rgba(15,13,11,0.35); color: var(--ink2); }
+.px-frame-send {
+  margin-left: auto; display: flex; align-items: center; gap: 7px;
+  padding: 0.35rem 0.95rem; background: var(--accent); border: none;
+  cursor: pointer; color: #fff;
+  font-family: 'Geist', sans-serif; font-size: 0.7rem; font-weight: 500;
+  transition: background 0.15s;
 }
-.px-stage-search-btn:hover { border-color: rgba(0,216,237,0.55); background: rgba(0,216,237,0.08); }
-.px-stage-send-btn {
-  width: 38px; height: 38px; display: grid; place-items: center; margin-left: auto;
-  border: 1px solid rgba(255,255,255,0.13); background: #18191c;
-  cursor: pointer; transition: border-color 150ms, background 150ms;
-}
-.px-stage-send-btn:hover { border-color: rgba(0,216,237,0.55); background: rgba(0,216,237,0.08); }
+.px-frame-send:hover { background: #a84016; }
 
 /* ── CHAT VIEW ── */
 .px-chat-view {
-  flex: 1; display: flex; flex-direction: column;
-  background:
-    linear-gradient(${GRID} 1px, transparent 1px),
-    linear-gradient(90deg, ${GRID} 1px, transparent 1px),
-    ${BG};
-  background-size: 24px 24px, 24px 24px;
-  overflow: hidden;
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column; overflow: hidden;
 }
 .px-chat-area {
-  flex: 1; overflow-y: auto;
+  flex: 1; min-height: 0; overflow-y: auto;
   padding: 2rem 0;
   display: flex; flex-direction: column; align-items: center;
 }
+.px-chat-area::-webkit-scrollbar { width: 2px; }
+.px-chat-area::-webkit-scrollbar-thumb { background: var(--dash); border-radius: 2px; }
 .px-messages-wrap {
-  width: 100%; max-width: 680px; padding: 0 1.5rem;
-  display: flex; flex-direction: column; gap: 1.75rem;
+  width: 100%; max-width: 660px; padding: 0 1.5rem;
+  display: flex; flex-direction: column; gap: 2rem;
 }
-.px-msg { display: flex; flex-direction: column; gap: 4px; animation: fadeUp 0.35s ease both; }
+.px-msg { display: flex; flex-direction: column; gap: 6px; animation: fadeUp 0.35s ease both; }
 .px-msg-role {
-  font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
-  color: ${TEXT_MUTED}; font-family: 'Geist', sans-serif;
-  padding: 0 2px; display: flex; align-items: center; gap: 6px;
+  font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink3); font-family: 'Geist', sans-serif;
+  display: flex; align-items: center; gap: 6px;
 }
-.px-msg-role-dot { width: 4px; height: 4px; border-radius: 50%; background: ${ACCENT}; }
-.px-msg-role-dot.user { background: rgba(0,216,237,0.6); }
+.px-msg-role-accent { width: 14px; height: 1px; background: var(--accent); opacity: 0.5; }
 .px-msg-bubble {
-  font-size: 0.85rem; line-height: 1.8;
-  font-weight: 300; color: ${TEXT_SECONDARY}; padding: 0 2px;
+  font-size: 0.85rem; line-height: 1.85;
+  font-weight: 300; color: var(--ink2); font-family: 'Geist', sans-serif;
 }
 .px-msg.user .px-msg-bubble {
-  background: rgba(255,255,255,0.03); border: 1px solid ${BORDER_SOFT};
-  border-radius: 6px; padding: 0.75rem 1rem; color: rgba(232,220,200,0.72);
+  background: var(--paper2); border: 1px dashed var(--dash);
+  padding: 0.75rem 1rem;
 }
-.px-msg-sources { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 0.75rem; }
+.px-msg-sources { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 0.85rem; }
 .px-source-chip {
   display: flex; align-items: center; gap: 5px;
   font-size: 0.6rem; font-family: 'Geist', sans-serif;
-  background: rgba(255,255,255,0.03); border: 1px solid ${BORDER_SOFT};
-  padding: 0.2rem 0.55rem; border-radius: 4px; color: ${TEXT_MUTED};
+  background: var(--paper2); border: 1px dashed var(--dash);
+  padding: 0.2rem 0.55rem; color: var(--ink3);
 }
 .px-source-fav {
-  width: 13px; height: 13px; border-radius: 3px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.5rem; font-weight: 700; color: #fff; flex-shrink: 0;
+  width: 12px; height: 12px; display: flex; align-items: center; justify-content: center;
+  font-size: 0.48rem; font-weight: 700; color: #fff; flex-shrink: 0;
 }
-.px-typing-dots { display: flex; gap: 4px; align-items: center; padding: 4px 2px; }
-.px-typing-dot { width: 5px; height: 5px; border-radius: 50%; background: ${ACCENT}; animation: tdot 1.2s ease infinite; }
-.px-typing-dot:nth-child(2){animation-delay:.2s} .px-typing-dot:nth-child(3){animation-delay:.4s}
 
-/* ── CHAT COMPOSER (bottom bar in chat view) ── */
+/* search status */
+.px-search-status { display: flex; flex-direction: column; gap: 8px; animation: slideIn 0.3s ease both; }
+.px-search-status-header { display: flex; align-items: center; gap: 8px; }
+.px-search-dots { display: flex; gap: 3px; align-items: center; }
+.px-search-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); animation: tdot 1.4s ease infinite; }
+.px-search-dot:nth-child(2){animation-delay:.18s} .px-search-dot:nth-child(3){animation-delay:.36s}
+.px-search-label { font-size: 0.7rem; color: var(--ink3); font-family: 'Geist', sans-serif; font-style: italic; }
+.px-search-sources-row { display: flex; gap: 5px; flex-wrap: wrap; }
+.px-search-source-pill {
+  display: flex; align-items: center; gap: 4px;
+  background: var(--paper2); border: 1px dashed var(--dash);
+  padding: 0.16rem 0.5rem;
+  font-size: 0.58rem; color: var(--ink3); font-family: 'Geist', sans-serif;
+  animation: slideIn 0.3s ease both;
+}
+.px-search-source-fav { width: 10px; height: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.42rem; font-weight: 700; color: #fff; }
+
+/* ── CHAT COMPOSER ── */
 .px-chat-composer {
-  border-top: 1px solid ${BORDER_SOFT};
-  background: rgba(7,8,8,0.7); backdrop-filter: blur(12px);
-  padding: 0.85rem 1.5rem 1rem; flex-shrink: 0; position: relative; z-index: 5;
+  flex-shrink: 0;
+  border-top: 1px dashed var(--dash);
+  background: rgba(242,236,224,0.92);
+  padding: 0.85rem 1.5rem 1rem;
 }
-.px-chat-composer-inner { max-width: 680px; margin: 0 auto; }
+.px-chat-composer-inner { max-width: 660px; margin: 0 auto; }
 .px-chat-composer-box {
-  border: 1px solid rgba(255,255,255,0.11); background: #18191c;
-  border-radius: 6px; overflow: hidden; transition: border-color 0.2s;
+  border: 1px dashed var(--dash); background: var(--paper2); position: relative;
 }
-.px-chat-composer-box:focus-within { border-color: rgba(255,255,255,0.2); }
+.px-chat-composer-box::before {
+  content: ''; position: absolute; inset: 5px;
+  border: 1px dashed rgba(15,13,11,0.07); pointer-events: none;
+}
+.px-chat-composer-dark { background: var(--paper2); margin: 1px; }
 .px-chat-textarea {
   display: block; width: 100%; resize: none; outline: none; border: none;
-  background: transparent; color: #c6c9d6;
-  padding: 0.85rem 1rem 0.6rem;
-  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 0.8rem; line-height: 1.6;
-  min-height: 72px; max-height: 180px;
+  background: transparent; color: var(--ink2);
+  padding: 0.8rem 1rem 0.6rem;
+  font-family: 'Geist', monospace; font-size: 0.78rem; line-height: 1.65;
+  min-height: 68px; max-height: 150px;
 }
-.px-chat-textarea::placeholder { color: #42474f; }
+.px-chat-textarea::placeholder { color: var(--ink3); opacity: 0.6; }
 .px-chat-composer-footer {
   display: flex; align-items: center; gap: 8px;
-  padding: 0.45rem 0.75rem;
-  border-top: 1px solid rgba(255,255,255,0.05);
+  padding: 0.4rem 0.75rem;
+  border-top: 1px dashed var(--dash); background: var(--paper3);
 }
-.px-cc-icon-btn {
-  width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
-  border: 1px solid rgba(255,255,255,0.1); background: none; border-radius: 4px;
-  cursor: pointer; color: ${TEXT_MUTED};
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+.px-cc-tag {
+  display: flex; align-items: center; gap: 5px;
+  padding: 0.2rem 0.55rem; border: 1px dashed var(--dash);
+  cursor: pointer; color: var(--ink3);
+  font-family: 'Geist', monospace; font-size: 0.6rem;
+  transition: border-color 0.15s, color 0.15s;
 }
-.px-cc-icon-btn:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.16); color: ${TEXT_SECONDARY}; }
-.px-cc-search-btn {
-  display: flex; align-items: center; gap: 7px; height: 30px; padding: 0 10px;
-  border: 1px solid rgba(255,255,255,0.1); background: none; border-radius: 4px;
-  cursor: pointer; color: ${TEXT_MUTED};
-  font-family: ui-monospace, monospace; font-size: 0.68rem;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-}
-.px-cc-search-btn:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.16); color: ${TEXT_SECONDARY}; }
+.px-cc-tag:hover { border-color: rgba(15,13,11,0.35); color: var(--ink2); }
 .px-cc-send {
-  width: 30px; height: 30px; border: 1px solid rgba(255,255,255,0.13);
-  background: #18191c; display: flex; align-items: center; justify-content: center;
-  border-radius: 4px; cursor: pointer; margin-left: auto;
-  transition: border-color 0.15s, background 0.15s;
+  margin-left: auto; display: flex; align-items: center; gap: 6px;
+  padding: 0.3rem 0.85rem; border: none; background: var(--accent);
+  cursor: pointer; color: #fff;
+  font-family: 'Geist', sans-serif; font-size: 0.68rem; font-weight: 500;
+  transition: background 0.15s;
 }
-.px-cc-send:hover { border-color: rgba(0,216,237,0.4); background: rgba(0,216,237,0.06); }
+.px-cc-send:hover { background: #a84016; }
 .px-composer-hint {
-  text-align: center; font-size: 0.62rem; color: ${TEXT_MUTED};
-  margin-top: 0.5rem; font-family: 'Geist', sans-serif; font-weight: 300; letter-spacing: 0.02em;
-}
-
-/* toast */
-.px-toast {
-  position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
-  border: 1px solid rgba(0,216,237,0.24); background: rgba(8,10,11,0.92);
-  color: #cdd2d9; padding: 11px 16px; max-width: 600px;
-  font-size: 12px; font-family: ui-monospace, Menlo, monospace;
-  white-space: nowrap; transition: opacity 180ms ease; pointer-events: none; z-index: 100;
+  text-align: center; font-size: 0.6rem; color: var(--ink3);
+  margin-top: 0.55rem; font-family: 'Geist', sans-serif; font-weight: 300; letter-spacing: 0.02em;
 }
 `;
 
-// ── typewriter hook (for hero placeholder) ───────────────────
-function useTypewriter(phrases, speed = 40, pause = 2400) {
-  const [displayed, setDisplayed] = useState("");
-  const [pi, setPi] = useState(0);
-  const [ci, setCi] = useState(0);
-  const [del, setDel] = useState(false);
-  useEffect(() => {
-    const cur = phrases[pi];
-    let t;
-    if (!del && ci <= cur.length) {
-      t = setTimeout(() => { setDisplayed(cur.slice(0, ci)); setCi(c => c + 1); }, speed);
-    } else if (!del && ci > cur.length) {
-      t = setTimeout(() => setDel(true), pause);
-    } else if (del && ci >= 0) {
-      t = setTimeout(() => { setDisplayed(cur.slice(0, ci)); setCi(c => c - 1); }, speed / 2);
-    } else {
-      setDel(false); setPi(i => (i + 1) % phrases.length);
-    }
-    return () => clearTimeout(t);
-  }, [ci, del, pi, phrases, speed, pause]);
-  return displayed;
-}
-
-const PLACEHOLDERS = [
-  "ASK: Generate a complex component architecture...",
-  "ASK: Build a real-time dashboard with WebSockets...",
-  "ASK: Create a design system with dark mode support...",
-  "ASK: Scaffold a Next.js app with auth and DB...",
+const SEARCH_SOURCES = [
+  { label: "W", bg: "#c0392b", domain: "wired.com" },
+  { label: "A", bg: "#1a1a2e", domain: "arxiv.org" },
+  { label: "L", bg: "#0077b5", domain: "linkedin.com" },
+  { label: "R", bg: "#ff4500", domain: "reddit.com" },
+  { label: "G", bg: "#24292e", domain: "github.com" },
 ];
 
 const INITIAL_CHATS = [
@@ -514,7 +440,7 @@ const SEED_MESSAGES = [
     role: "assistant",
     text: "Purplex leads 2026 benchmarks with sub-300ms first-token latency. It reads live sources — not a frozen training snapshot — and returns a single cited answer instead of ten blue links.",
     sources: [
-      { label: "W", bg: "#e34c26", domain: "wired.com" },
+      { label: "W", bg: "#c0392b", domain: "wired.com" },
       { label: "A", bg: "#1a1a2e", domain: "arxiv.org" },
       { label: "L", bg: "#0077b5", domain: "linkedin.com" },
     ],
@@ -523,38 +449,89 @@ const SEED_MESSAGES = [
 
 const MODES = ["Search", "Deep", "Reason"];
 
-// ── ICONS ────────────────────────────────────────────────────
+function useTypewriter(phrases, speed = 42, pause = 2600) {
+  const [displayed, setDisplayed] = useState("");
+  const [pi, setPi] = useState(0);
+  const [ci, setCi] = useState(0);
+  const [del, setDel] = useState(false);
+  useEffect(() => {
+    const cur = phrases[pi];
+    let t;
+    if (!del && ci <= cur.length) {
+      t = setTimeout(() => { setDisplayed(cur.slice(0, ci)); setCi(c => c + 1); }, speed);
+    } else if (!del && ci > cur.length) {
+      t = setTimeout(() => setDel(true), pause);
+    } else if (del && ci >= 0) {
+      t = setTimeout(() => { setDisplayed(cur.slice(0, ci)); setCi(c => c - 1); }, speed / 2.2);
+    } else {
+      setDel(false); setPi(i => (i + 1) % phrases.length);
+    }
+    return () => clearTimeout(t);
+  }, [ci, del, pi, phrases, speed, pause]);
+  return displayed;
+}
+
+const PLACEHOLDERS = [
+  "$ ask — best AI search engine in 2026...",
+  "$ ask — how does RAG differ from fine-tuning...",
+  "$ ask — build a real-time dashboard with WebSockets...",
+  "$ ask — what are vector embeddings...",
+];
+
 const Ic = {
-  Plus: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 5v14M5 12h14"/></svg>,
-  User: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>,
-  Settings: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M19.07 4.93l-2.12 2.12M7.05 16.95l-2.12 2.12"/></svg>,
-  Logout: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>,
-  Share: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="18" cy="5" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="18" cy="19" r="2"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>,
-  More: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>,
-  Send: () => <svg viewBox="0 0 24 24" width="14" height="14" fill={CYAN} strokeWidth="0"><path d="M5 11h10.5l-3.8-3.8L13.4 5 21 12l-7.6 7-1.7-2.2 3.8-3.8H5z"/></svg>,
-  Nodes: () => <svg viewBox="0 0 24 24" width="12" height="12" fill={CYAN}><circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="5" r="2.2"/><circle cx="19" cy="12" r="2.2"/><circle cx="12" cy="19" r="2.2"/></svg>,
-  Clear: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v4m0 6v4M5 12h4m6 0h4"/><circle cx="12" cy="12" r="7" opacity=".2"/></svg>,
-  Attach: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>,
-  CodeGen: () => <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#6b6c72" strokeWidth="1.6"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>,
-  Design: () => <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#6b6c72" strokeWidth="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M19.07 4.93l-2.12 2.12M7.05 16.95l-2.12 2.12"/></svg>,
-  Deploy: () => <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#6b6c72" strokeWidth="1.6"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>,
-  Chat: () => <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#6b6c72" strokeWidth="1.6"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
+  Plus:     () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>,
+  User:     () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>,
+  Settings: () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M19.07 4.93l-2.12 2.12M7.05 16.95l-2.12 2.12"/></svg>,
+  Logout:   () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>,
+  Share:    () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="18" cy="5" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="18" cy="19" r="2"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>,
+  More:     () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>,
+  Send:     () => <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M5 11h10.5l-3.8-3.8L13.4 5 21 12l-7.6 7-1.7-2.2 3.8-3.8H5z"/></svg>,
+  Attach:   () => <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>,
+  Nodes:    () => <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" opacity="0.7"><circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="5" r="2.2"/><circle cx="19" cy="12" r="2.2"/><circle cx="12" cy="19" r="2.2"/></svg>,
 };
 
-// ── MESSAGE ──────────────────────────────────────────────────
-function Message({ role, text, sources, typing }) {
+function SearchStatus({ phase }) {
+  const [visibleSources, setVisibleSources] = useState([]);
+  const phases = ["Searching the live web…", "Reading sources…", "Cross-referencing…", "Synthesising answer…"];
+  const label = phases[Math.min(phase, phases.length - 1)];
+  useEffect(() => {
+    setVisibleSources([]);
+    const timers = SEARCH_SOURCES.map((s, i) =>
+      setTimeout(() => setVisibleSources(prev => [...prev, s]), i * 280 + 200)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, []);
+  return (
+    <div className="px-search-status">
+      <div className="px-search-status-header">
+        <div className="px-search-dots">
+          <div className="px-search-dot"/><div className="px-search-dot"/><div className="px-search-dot"/>
+        </div>
+        <span className="px-search-label">{label}</span>
+      </div>
+      <div className="px-search-sources-row">
+        {visibleSources.map((s, i) => (
+          <div key={i} className="px-search-source-pill" style={{ animationDelay: `${i * 0.08}s` }}>
+            <div className="px-search-source-fav" style={{ background: s.bg }}>{s.label}</div>
+            {s.domain}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Message({ role, text, sources, searching, searchPhase }) {
   const isUser = role === "user";
   return (
     <div className={`px-msg${isUser ? " user" : ""}`}>
       <div className="px-msg-role">
-        <span className={`px-msg-role-dot${isUser ? " user" : ""}`} />
+        <div className="px-msg-role-accent" />
         {isUser ? "You" : "Purplex"}
       </div>
       <div className="px-msg-bubble">
-        {typing
-          ? <div className="px-typing-dots"><div className="px-typing-dot"/><div className="px-typing-dot"/><div className="px-typing-dot"/></div>
-          : text}
-        {!typing && sources?.length > 0 && (
+        {searching ? <SearchStatus phase={searchPhase || 0} /> : text}
+        {!searching && sources?.length > 0 && (
           <div className="px-msg-sources">
             {sources.map((s, i) => (
               <div key={i} className="px-source-chip">
@@ -569,13 +546,12 @@ function Message({ role, text, sources, typing }) {
   );
 }
 
-// ── HERO SCREEN (original Kreona design, now with sidebar) ───
 function HeroScreen({ onSend }) {
   const [value, setValue] = useState("");
   const placeholder = useTypewriter(PLACEHOLDERS, 38, 2600);
 
   function send() {
-    const text = value.trim() || PLACEHOLDERS[0].replace("ASK: ", "").replace("...", "");
+    const text = value.trim() || "best AI search engines in 2026";
     onSend(text);
   }
   function handleKey(e) {
@@ -584,67 +560,32 @@ function HeroScreen({ onSend }) {
 
   return (
     <div className="px-hero-screen">
-      {/* beams */}
-      <div className="px-beam-v px-beam-vl" aria-hidden="true" />
-      <div className="px-beam-v px-beam-vr" aria-hidden="true" />
-
-      {/* hero text */}
-      <section className="px-hero-section" aria-label="Studio">
+      <div className="px-hero-rails" aria-hidden="true">
+        <div className="px-rail px-rail-l" />
+        <div className="px-rail px-rail-r" />
+        <div className="px-hero-hline2" />
+      </div>
+      <section className="px-hero-section">
+        <div className="px-hero-eyebrow">
+          <span className="px-eyebrow-dot" />
+          v1.0 — now in public beta
+        </div>
         <h1 className="px-hero-title">
-          AI-Powered Code &amp;<br />Architecture Design
+          search that<br /><em>reasons,</em> not retrieves.
         </h1>
         <p className="px-hero-sub">
-          Kreona Studio is your source for high-quality, scalable web assembly.<br />
-          Generate components, create designs, and chat with AI in seconds.
+          Purplex reads the live web, thinks through it, and gives you one answer you can trust.<br />
+          No ten blue links. One cited answer.
         </p>
       </section>
-
-      {/* stage */}
-      <section
-        style={{ position: "relative", zIndex: 2, width: "min(100%, 1200px)", height: 440, margin: "48px auto 0" }}
-        aria-label="Command center"
-      >
-        {/* cyan rule */}
-        <div className="px-cyan-rule" aria-hidden="true" />
-
-        {/* CTA row */}
-        <div className="px-cta-row">
-          <div className="px-cta-line-l">
-            <div className="px-beam-h px-beam-hl" />
-          </div>
-          <button className="px-cta-btn" onClick={send}>START BUILDING FREE</button>
-          <div className="px-cta-line-r">
-            <div className="px-beam-h px-beam-hr" />
-          </div>
+      <div className="px-composer-frame">
+        <div className="px-mac-bar">
+          <span className="px-mac-dot" style={{ background: "#ff5f57" }} />
+          <span className="px-mac-dot" style={{ background: "#febc2e" }} />
+          <span className="px-mac-dot" style={{ background: "#27c93f" }} />
+          <span className="px-mac-filename">purplex / search.query.tsx</span>
         </div>
-
-        {/* frame horizontal lines */}
-        <div className="px-frame-line-h" style={{ position: "absolute", top: 85 + 48, left: 90, right: 90 }} />
-        <div className="px-frame-line-h" style={{ position: "absolute", bottom: 68, left: 90, right: 90 }} />
-
-        {/* Feature: Code Gen — top left */}
-        <div className="px-feat" style={{ left: 90 - 45, top: 85 - 36 }}>
-          <div className="px-feat-icon"><Ic.CodeGen /></div>
-          <span>Code Gen</span>
-        </div>
-        {/* Feature: Design Sys — top right */}
-        <div className="px-feat" style={{ right: 90 - 45, top: 85 - 36 }}>
-          <div className="px-feat-icon"><Ic.Design /></div>
-          <span>Design Sys</span>
-        </div>
-        {/* Feature: Deploy — bottom left */}
-        <div className="px-feat" style={{ left: 90 - 45, bottom: 30 }}>
-          <div className="px-feat-icon"><Ic.Deploy /></div>
-          <span>Deploy</span>
-        </div>
-        {/* Feature: AI Chat — bottom right */}
-        <div className="px-feat" style={{ right: 90 - 45, bottom: 30 }}>
-          <div className="px-feat-icon"><Ic.Chat /></div>
-          <span>AI Chat</span>
-        </div>
-
-        {/* Composer */}
-        <div className="px-composer-stage">
+        <div className="px-frame-body">
           <textarea
             className="px-stage-textarea"
             spellCheck={false}
@@ -653,36 +594,31 @@ function HeroScreen({ onSend }) {
             onChange={e => setValue(e.target.value)}
             onKeyDown={handleKey}
           />
-          <div className="px-stage-footer">
-            <button className="px-stage-icon-btn" onClick={() => setValue("")} aria-label="Clear">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke={CYAN} strokeWidth="2"><path d="M12 5v4m0 6v4M5 12h4m6 0h4"/><circle cx="12" cy="12" r="7" opacity=".25"/></svg>
-            </button>
-            <button className="px-stage-search-btn">
-              <Ic.Nodes /><span>/Search-Command</span>
-            </button>
-            <button className="px-stage-send-btn" onClick={send} aria-label="Send">
-              <Ic.Send />
+          <div className="px-frame-footer">
+            <div className="px-frame-tag"><Ic.Nodes /> /web-search</div>
+            <div className="px-frame-tag"><Ic.Attach /> attach</div>
+            <button className="px-frame-send" onClick={send}>
+              try purplex &nbsp;<Ic.Send />
             </button>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 }
 
-// ── CHAT VIEW ────────────────────────────────────────────────
-function ChatView({ messages, isTyping, onSend }) {
+function ChatView({ messages, onSend }) {
   const [value, setValue] = useState("");
   const areaRef = useRef(null);
   const taRef = useRef(null);
 
   useEffect(() => {
     if (areaRef.current) areaRef.current.scrollTop = areaRef.current.scrollHeight;
-  }, [messages, isTyping]);
+  }, [messages]);
 
   function autoResize(el) {
     el.style.height = "auto";
-    el.style.height = Math.min(el.scrollHeight, 180) + "px";
+    el.style.height = Math.min(el.scrollHeight, 150) + "px";
   }
   function handleKey(e) {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
@@ -697,82 +633,68 @@ function ChatView({ messages, isTyping, onSend }) {
       <div className="px-chat-area" ref={areaRef}>
         <div className="px-messages-wrap">
           {messages.map((m, i) => (
-            <Message key={i} role={m.role} text={m.text} sources={m.sources} />
+            <Message key={i} role={m.role} text={m.text} sources={m.sources}
+              searching={m.searching} searchPhase={m.searchPhase} />
           ))}
-          {isTyping && <Message role="assistant" typing />}
         </div>
       </div>
       <div className="px-chat-composer">
         <div className="px-chat-composer-inner">
           <div className="px-chat-composer-box">
-            <textarea
-              ref={taRef}
-              className="px-chat-textarea"
-              placeholder="ASK: Search the live web for anything…"
-              value={value}
-              onChange={e => { setValue(e.target.value); autoResize(e.target); }}
-              onKeyDown={handleKey}
-              spellCheck={false}
-            />
-            <div className="px-chat-composer-footer">
-              <button className="px-cc-icon-btn" onClick={() => setValue("")}><Ic.Clear /></button>
-              <button className="px-cc-search-btn"><Ic.Nodes />/Search-Command</button>
-              <button className="px-cc-icon-btn"><Ic.Attach /></button>
-              <button className="px-cc-send" onClick={send}><Ic.Send /></button>
+            <div className="px-chat-composer-dark">
+              <textarea
+                ref={taRef}
+                className="px-chat-textarea"
+                placeholder="$ ask — search the live web for anything…"
+                value={value}
+                onChange={e => { setValue(e.target.value); autoResize(e.target); }}
+                onKeyDown={handleKey}
+                spellCheck={false}
+              />
+              <div className="px-chat-composer-footer">
+                <div className="px-cc-tag"><Ic.Nodes /> /web-search</div>
+                <div className="px-cc-tag"><Ic.Attach /> attach</div>
+                <button className="px-cc-send" onClick={send}>send &nbsp;<Ic.Send /></button>
+              </div>
             </div>
           </div>
-          <p className="px-composer-hint">purplex reads the live web — answers cite real sources &nbsp;·&nbsp; press ⏎ to send</p>
+          <p className="px-composer-hint">purplex reads the live web — answers cite real sources · press ⏎ to send</p>
         </div>
       </div>
     </div>
   );
 }
 
-// ── ROOT ─────────────────────────────────────────────────────
 export default function PurplexDashboard() {
   const [chatGroups, setChatGroups] = useState(INITIAL_CHATS);
-  const [activeChatId, setActiveChatId] = useState(null); // null = hero
+  const [activeChatId, setActiveChatId] = useState(null);
   const [activeTitle, setActiveTitle] = useState("New search");
   const [messages, setMessages] = useState([]);
-  const [isTyping, setIsTyping] = useState(false);
   const [mode, setMode] = useState("Search");
-  const [toast, setToast] = useState({ text: "", visible: false });
-  const toastTimer = useRef(null);
   const nextId = useRef(100);
+  const searchTimers = useRef([]);
 
   useEffect(() => {
-    const id = "purplex-dash-css";
+    const id = "purplex-dash-css-v4";
     if (!document.getElementById(id)) {
       const s = document.createElement("style"); s.id = id; s.textContent = GLOBAL_CSS;
       document.head.appendChild(s);
     }
-    return () => { const el = document.getElementById(id); if (el) el.remove(); };
+    return () => {
+      const el = document.getElementById(id); if (el) el.remove();
+      searchTimers.current.forEach(clearTimeout);
+    };
   }, []);
 
-  function showToast(msg) {
-    clearTimeout(toastTimer.current);
-    setToast({ text: msg, visible: true });
-    toastTimer.current = setTimeout(() => setToast(t => ({ ...t, visible: false })), 3800);
-  }
-
   function selectChat(id, title) {
-    setActiveChatId(id);
-    setActiveTitle(title);
-    setMessages(SEED_MESSAGES);
-    setIsTyping(false);
+    setActiveChatId(id); setActiveTitle(title); setMessages(SEED_MESSAGES);
   }
-
   function newChat() {
-    setActiveChatId(null);
-    setActiveTitle("New search");
-    setMessages([]);
-    setIsTyping(false);
+    setActiveChatId(null); setActiveTitle("New search"); setMessages([]);
+    searchTimers.current.forEach(clearTimeout);
   }
-
   function handleSend(text) {
-    const shortTitle = text.length > 40 ? text.slice(0, 40) + "…" : text;
-
-    // If coming from hero, create new chat
+    const shortTitle = text.length > 42 ? text.slice(0, 42) + "…" : text;
     if (activeChatId === null) {
       const id = nextId.current++;
       setChatGroups(prev => {
@@ -780,47 +702,73 @@ export default function PurplexDashboard() {
         updated[0] = { ...updated[0], items: [{ id, title: shortTitle, time: "now" }, ...updated[0].items] };
         return updated;
       });
-      setActiveChatId(id);
-      setActiveTitle(shortTitle);
-      setMessages([{ role: "user", text, sources: [] }]);
+      setActiveChatId(id); setActiveTitle(shortTitle);
+      setMessages([
+        { role: "user", text, sources: [] },
+        { role: "assistant", searching: true, searchPhase: 0, text: "", sources: [] },
+      ]);
     } else {
-      setMessages(prev => [...prev, { role: "user", text, sources: [] }]);
+      setMessages(prev => [
+        ...prev,
+        { role: "user", text, sources: [] },
+        { role: "assistant", searching: true, searchPhase: 0, text: "", sources: [] },
+      ]);
       setActiveTitle(shortTitle);
     }
-
-    showToast("Searching live web…");
-    setIsTyping(true);
-
-    setTimeout(() => {
-      setIsTyping(false);
-      setMessages(prev => [...prev, {
-        role: "assistant",
-        text: "Based on live web sources retrieved in real time, here's a synthesised answer cross-referenced for accuracy and completeness across multiple authoritative references.",
-        sources: [
-          { label: "W", bg: "#e34c26", domain: "wired.com" },
-          { label: "A", bg: "#1a1a2e", domain: "arxiv.org" },
-        ],
-      }]);
-    }, 2000);
+    [0,1,2,3].forEach((ph, i) => {
+      const t = setTimeout(() => {
+        setMessages(prev => {
+          const u = [...prev]; const li = u.length - 1;
+          if (u[li]?.searching) u[li] = { ...u[li], searchPhase: ph };
+          return u;
+        });
+      }, i * 520);
+      searchTimers.current.push(t);
+    });
+    const ans = setTimeout(() => {
+      setMessages(prev => {
+        const u = [...prev]; const li = u.length - 1;
+        if (u[li]?.searching) {
+          u[li] = {
+            role: "assistant", searching: false,
+            text: "Based on live web sources retrieved in real time, here's a synthesised answer cross-referenced for accuracy and completeness across multiple authoritative references.",
+            sources: [
+              { label: "W", bg: "#c0392b", domain: "wired.com" },
+              { label: "A", bg: "#1a1a2e", domain: "arxiv.org" },
+              { label: "L", bg: "#0077b5", domain: "linkedin.com" },
+            ],
+          };
+        }
+        return u;
+      });
+    }, 2400);
+    searchTimers.current.push(ans);
   }
 
   const isHero = activeChatId === null;
 
   return (
-    <div style={{ display: "flex", height: "100vh", width: "100vw", background: BG, color: TEXT_PRIMARY, fontFamily: "'Geist', sans-serif", overflow: "hidden" }}>
-      {/* ── SIDEBAR ── */}
+    <div className="px-root" style={{
+      display: "flex", height: "100vh", width: "100vw",
+      fontFamily: "'Geist', sans-serif", overflow: "hidden",
+    }}>
+      {/* SIDEBAR */}
       <aside className="px-sidebar">
         <div className="px-sidebar-logo" onClick={newChat}>
           <div className="px-logo-mark">P</div>
           <span className="px-logo-text">purplex</span>
         </div>
-        <div style={{ margin: "0.9rem 0.85rem 0.5rem" }}>
-          <button className="px-new-chat-btn" onClick={newChat}><Ic.Plus /> New search</button>
+        <div style={{ margin: "0.8rem 0.8rem 0.4rem", flexShrink: 0 }}>
+          <button className="px-new-chat-btn" onClick={newChat}>
+            <Ic.Plus /> New search
+          </button>
         </div>
         <div className="px-sidebar-chats">
           {chatGroups.map((group, gi) => (
             <div key={gi}>
-              <div className="px-section-label" style={gi > 0 ? { marginTop: "0.5rem" } : {}}>{group.group}</div>
+              <div className="px-section-label" style={gi > 0 ? { marginTop: "0.4rem" } : {}}>
+                {group.group}
+              </div>
               {group.items.map(item => (
                 <div
                   key={item.id}
@@ -836,40 +784,37 @@ export default function PurplexDashboard() {
           ))}
         </div>
         <div className="px-sidebar-bottom">
-          <hr className="px-sidebar-divider" />
           <button className="px-sidebar-btn"><Ic.User /> Account</button>
           <button className="px-sidebar-btn"><Ic.Settings /> Settings</button>
           <button className="px-sidebar-btn danger"><Ic.Logout /> Sign out</button>
         </div>
       </aside>
 
-      {/* ── MAIN ── */}
-      <main className="px-main">
-        {/* topbar always visible */}
-        <div className="px-topbar">
-          <div className="px-topbar-title">{activeTitle}</div>
-          <div className="px-topbar-actions">
-            <div className="px-mode-toggle">
-              {MODES.map(m => (
-                <button key={m} className={`px-mode-btn${mode === m ? " active" : ""}`} onClick={() => setMode(m)}>{m}</button>
-              ))}
+      {/* MAIN — hatch border via padding, inner box fills remaining space */}
+      <div className="px-main-wrapper">
+        <div className="px-main-inner">
+          {/* TOPBAR */}
+          <div className="px-topbar">
+            <div className="px-topbar-title">{activeTitle}</div>
+            <div className="px-topbar-actions">
+              <div className="px-mode-toggle">
+                {MODES.map(m => (
+                  <button key={m} className={`px-mode-btn${mode === m ? " active" : ""}`} onClick={() => setMode(m)}>
+                    {m}
+                  </button>
+                ))}
+              </div>
+              <div className="px-live-badge"><span className="px-badge-dot" />Live</div>
+              <button className="px-topbar-icon-btn"><Ic.Share /></button>
+              <button className="px-topbar-icon-btn"><Ic.More /></button>
             </div>
-            <div className="px-live-badge"><span className="px-badge-dot" />Live</div>
-            <button className="px-topbar-icon-btn"><Ic.Share /></button>
-            <button className="px-topbar-icon-btn"><Ic.More /></button>
           </div>
+
+          {isHero
+            ? <HeroScreen onSend={handleSend} />
+            : <ChatView messages={messages} onSend={handleSend} />
+          }
         </div>
-
-        {/* hero or chat */}
-        {isHero
-          ? <HeroScreen onSend={handleSend} />
-          : <ChatView messages={messages} isTyping={isTyping} onSend={handleSend} />
-        }
-      </main>
-
-      {/* toast */}
-      <div className="px-toast" role="status" aria-live="polite" style={{ opacity: toast.visible ? 1 : 0 }}>
-        {toast.text}
       </div>
     </div>
   );

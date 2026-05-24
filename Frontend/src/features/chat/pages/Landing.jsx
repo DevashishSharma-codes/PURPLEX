@@ -4,10 +4,10 @@ const GLOBAL_CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Geist:wght@300;400;500;600&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --ink:#0f0d0b;--ink2:#3a3530;--ink3:#857e76;
-  --paper:#f5f0e8;--paper2:#ede6d8;--paper3:#e4dacb;
-  --dash:rgba(15,13,11,0.18);
-  --accent:#c8501a;--accent2:#e8703a;
+  --ink:#2c1f14;--ink2:#5a3e2b;--ink3:#9c7e6a;
+  --paper:#f7f2e8;--paper2:#efe7d6;--paper3:#e6dac8;
+  --dash:rgba(44,31,20,0.15);
+  --accent:#c4714a;--accent2:#d4896a;
 }
 html{scroll-behavior:smooth}
 body{font-family:'Geist',sans-serif;background:var(--paper);color:var(--ink);overflow-x:hidden;margin:0}
@@ -20,76 +20,76 @@ body{font-family:'Geist',sans-serif;background:var(--paper);color:var(--ink);ove
 @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 
-.px-nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 2.5rem;height:58px;background:rgba(0,0,0,0.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,0.04)}
-.px-logo{font-family:'Libre Baskerville',serif;font-size:1.3rem;color:#f7f4ef;letter-spacing:-0.02em;display:flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none}
-.px-logo-mark{width:22px;height:22px;border:1.5px solid rgba(255,255,255,0.18);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:600;font-family:'Geist',sans-serif;color:#f7f4ef}
+.px-nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 2.5rem;height:58px;background:rgba(247,242,232,0.94);backdrop-filter:blur(18px);border-bottom:1px solid rgba(44,31,20,0.08)}
+.px-logo{font-family:'Libre Baskerville',serif;font-size:1.3rem;color:var(--ink);letter-spacing:-0.02em;display:flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none}
+.px-logo-mark{width:22px;height:22px;border:1.5px solid rgba(44,31,20,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:600;font-family:'Geist',sans-serif;color:var(--ink)}
 .px-nav-links{display:flex;gap:0;list-style:none;position:relative}
 .px-nav-item{position:relative}
-.px-nav-item>a,.px-nav-item>button{font-size:0.78rem;letter-spacing:0.04em;color:rgba(255,255,255,0.4);text-decoration:none;text-transform:uppercase;transition:color .2s;background:none;border:none;cursor:pointer;font-family:'Geist',sans-serif;padding:.4rem 1rem;display:flex;align-items:center;gap:4px;height:58px}
-.px-nav-item>a:hover,.px-nav-item>button:hover{color:rgba(255,255,255,.85)}
+.px-nav-item>a,.px-nav-item>button{font-size:0.78rem;letter-spacing:0.04em;color:rgba(44,31,20,0.45);text-decoration:none;text-transform:uppercase;transition:color .2s;background:none;border:none;cursor:pointer;font-family:'Geist',sans-serif;padding:.4rem 1rem;display:flex;align-items:center;gap:4px;height:58px}
+.px-nav-item>a:hover,.px-nav-item>button:hover{color:rgba(44,31,20,.85)}
 .px-chevron{font-size:.55rem;opacity:.5;transition:transform .2s}
 .px-nav-item.open .px-chevron{transform:rotate(180deg)}
-.px-dropdown{position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);background:rgba(12,10,9,0.97);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:.5rem;min-width:240px;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:slideDown .18s ease both;z-index:300}
+.px-dropdown{position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);background:rgba(247,242,232,0.98);border:1px solid rgba(44,31,20,.08);border-radius:10px;padding:.5rem;min-width:240px;box-shadow:0 20px 60px rgba(44,20,10,.1);animation:slideDown .18s ease both;z-index:300}
 .px-dropdown-item{display:flex;align-items:flex-start;gap:10px;padding:.65rem .8rem;border-radius:7px;cursor:pointer;transition:background .15s;text-decoration:none}
-.px-dropdown-item:hover{background:rgba(255,255,255,.05)}
-.px-di-icon{width:28px;height:28px;border-radius:6px;background:rgba(200,80,26,.12);border:1px solid rgba(200,80,26,.2);display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;margin-top:1px}
-.px-di-title{font-size:.75rem;color:rgba(255,255,255,.82);font-family:'Geist',sans-serif;font-weight:500;margin-bottom:.15rem}
-.px-di-sub{font-size:.65rem;color:rgba(255,255,255,.3);font-family:'Geist',sans-serif;line-height:1.4}
+.px-dropdown-item:hover{background:var(--paper2)}
+.px-di-icon{width:28px;height:28px;border-radius:6px;background:rgba(196,113,74,.12);border:1px solid rgba(196,113,74,.2);display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;margin-top:1px}
+.px-di-title{font-size:.75rem;color:var(--ink2);font-family:'Geist',sans-serif;font-weight:500;margin-bottom:.15rem}
+.px-di-sub{font-size:.65rem;color:var(--ink3);font-family:'Geist',sans-serif;line-height:1.4}
 .px-nav-right{display:flex;align-items:center;gap:.75rem}
-.px-btn-ghost-nav{font-family:'Geist',sans-serif;font-size:.8rem;color:rgba(255,255,255,.4);background:none;border:none;cursor:pointer;padding:.4rem .8rem}
-.px-btn-nav{font-family:'Geist',sans-serif;font-size:.8rem;font-weight:500;background:var(--accent);color:#fff;border:none;padding:.5rem 1.2rem;cursor:pointer;border-radius:6px;transition:background .2s}
-.px-btn-nav:hover{background:#a84016}
+.px-btn-ghost-nav{font-family:'Geist',sans-serif;font-size:.8rem;color:var(--ink3);background:none;border:none;cursor:pointer;padding:.4rem .8rem}
+.px-btn-nav{font-family:'Geist',sans-serif;font-size:.8rem;font-weight:500;background:var(--accent);color:#f7f0e6;border:none;padding:.5rem 1.2rem;cursor:pointer;border-radius:6px;transition:background .2s}
+.px-btn-nav:hover{background:#a85c38}
 
-.px-hero-wrap{background:#000;position:relative;overflow:hidden;padding-top:58px;min-height:100vh;display:flex;flex-direction:column}
+.px-hero-wrap{background:var(--paper);position:relative;overflow:hidden;padding-top:58px;min-height:100vh;display:flex;flex-direction:column}
 .px-ascii-canvas{position:relative;width:100%;height:280px;display:block;flex-shrink:0;z-index:2}
 .px-hero-inner{position:relative;z-index:4;flex:1;display:flex;flex-direction:column;align-items:center;max-width:1200px;margin:0 auto;padding:2rem 2.5rem 4rem;width:100%;animation:fadeUp .9s ease both}
 .px-hero-left{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;margin-bottom:3rem}
 .px-hero-right{width:100%;display:flex;align-items:flex-start;justify-content:center;animation:fadeUp .9s .22s ease both}
-.px-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(200,80,26,0.1);border:1px solid rgba(200,80,26,0.22);border-radius:999px;padding:.35rem 1.1rem;font-size:.7rem;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--accent2);margin-bottom:1.5rem}
+.px-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(196,113,74,0.1);border:1px solid rgba(196,113,74,0.22);border-radius:999px;padding:.35rem 1.1rem;font-size:.7rem;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--accent2);margin-bottom:1.5rem}
 .px-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:bpulse 2s infinite;flex-shrink:0}
-.px-h1{font-family:'Libre Baskerville',serif;font-size:clamp(3.2rem,5.5vw,6rem);line-height:1.05;letter-spacing:-.04em;color:#e8dcc8;margin-bottom:1.4rem}
-.px-h1 em{font-style:italic;color:rgba(232,220,200,.32)}
-.px-hero-p{font-size:1rem;font-weight:300;color:rgba(247,244,239,.42);line-height:1.75;max-width:480px;margin:0 0 2.2rem}
+.px-h1{font-family:'Libre Baskerville',serif;font-size:clamp(3.2rem,5.5vw,6rem);line-height:1.05;letter-spacing:-.04em;color:var(--ink);margin-bottom:1.4rem}
+.px-h1 em{font-style:italic;color:var(--ink3)}
+.px-hero-p{font-size:1rem;font-weight:300;color:var(--ink3);line-height:1.75;max-width:480px;margin:0 0 2.2rem}
 .px-hero-btns{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap}
-.px-btn-cta{font-family:'Geist',sans-serif;font-size:.9rem;font-weight:500;background:var(--accent);color:#fff;border:none;padding:.8rem 2rem;cursor:pointer;border-radius:7px;transition:background .2s,transform .15s}
-.px-btn-cta:hover{background:#a84016;transform:translateY(-1px)}
-.px-btn-ghost2{font-size:.9rem;color:rgba(247,244,239,.45);display:flex;align-items:center;gap:6px;cursor:pointer;background:none;border:1px solid rgba(255,255,255,.1);padding:.8rem 1.6rem;border-radius:7px;font-family:'Geist',sans-serif;transition:all .2s}
-.px-btn-ghost2:hover{color:rgba(247,244,239,.85);border-color:rgba(255,255,255,.25)}
+.px-btn-cta{font-family:'Geist',sans-serif;font-size:.9rem;font-weight:500;background:var(--accent);color:#f7f0e6;border:none;padding:.8rem 2rem;cursor:pointer;border-radius:7px;transition:background .2s,transform .15s}
+.px-btn-cta:hover{background:#a85c38;transform:translateY(-1px)}
+.px-btn-ghost2{font-size:.9rem;color:var(--ink2);display:flex;align-items:center;gap:6px;cursor:pointer;background:none;border:1px solid rgba(44,31,20,0.18);padding:.8rem 1.6rem;border-radius:7px;font-family:'Geist',sans-serif;transition:all .2s}
+.px-btn-ghost2:hover{color:var(--ink);border-color:rgba(44,31,20,.35)}
 
-.px-mac-window{background:#0e0c0b;border:1px solid rgba(255,255,255,0.08);border-radius:12px 12px 0 0;overflow:hidden;width:100%;max-width:900px;box-shadow:0 0 0 1px rgba(255,255,255,.03),0 40px 80px rgba(0,0,0,0.6)}
-.px-mac-bar{display:flex;align-items:center;gap:8px;padding:.72rem 1.1rem;background:#0a0908;border-bottom:1px solid rgba(255,255,255,.04)}
+.px-mac-window{background:#faf5ec;border:1px solid rgba(44,31,20,0.1);border-radius:12px 12px 0 0;overflow:hidden;width:100%;max-width:900px;box-shadow:0 0 0 1px rgba(44,31,20,.03),0 40px 80px rgba(44,20,10,0.1)}
+.px-mac-bar{display:flex;align-items:center;gap:8px;padding:.72rem 1.1rem;background:#ede6d5;border-bottom:1px solid rgba(44,31,20,.06)}
 .px-mac-dot{width:11px;height:11px;border-radius:50%}
-.px-mac-url{flex:1;margin:0 .8rem;background:rgba(255,255,255,.05);border-radius:5px;padding:.28rem .85rem;font-size:.7rem;color:rgba(255,255,255,.28);font-family:'Geist',sans-serif;display:flex;align-items:center;gap:6px}
-.px-mac-content{padding:.9rem 1.4rem;min-height:180px;position:relative;overflow:hidden}
-.px-search-bar{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:7px;padding:.7rem 1.1rem;margin-bottom:1.25rem}
-.px-brand-tag{font-family:'Libre Baskerville',serif;font-size:.75rem;color:rgba(255,255,255,.42);display:flex;align-items:center;gap:5px;flex-shrink:0;border-right:1px solid rgba(255,255,255,.06);padding-right:12px}
-.px-brand-dot{width:6px;height:6px;border-radius:50%;background:#c8501a}
-.px-stext{font-size:.85rem;color:rgba(255,255,255,.82);font-family:'Geist',sans-serif;font-weight:300;flex:1;min-height:20px}
-.px-cursor{display:inline-block;width:2px;height:14px;background:rgba(200,80,26,.9);margin-left:1px;vertical-align:middle;animation:blink 1s step-end infinite}
-.px-sbtn{font-family:'Geist',sans-serif;font-size:.7rem;font-weight:500;background:var(--accent);color:#fff;border:none;padding:.35rem .9rem;border-radius:5px;cursor:pointer;flex-shrink:0}
+.px-mac-url{flex:1;margin:0 .8rem;background:rgba(44,31,20,.05);border-radius:5px;padding:.28rem .85rem;font-size:.7rem;color:var(--ink3);font-family:'Geist',sans-serif;display:flex;align-items:center;gap:6px}
+.px-mac-content{padding:.9rem 1.4rem;min-height:180px;position:relative;overflow:hidden;background:#f5ede0}
+.px-search-bar{display:flex;align-items:center;gap:10px;background:#faf5ec;border:1px solid rgba(44,31,20,.1);border-radius:7px;padding:.7rem 1.1rem;margin-bottom:1.25rem}
+.px-brand-tag{font-family:'Libre Baskerville',serif;font-size:.75rem;color:var(--ink3);display:flex;align-items:center;gap:5px;flex-shrink:0;border-right:1px solid rgba(44,31,20,.08);padding-right:12px}
+.px-brand-dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.px-stext{font-size:.85rem;color:var(--ink);font-family:'Geist',sans-serif;font-weight:300;flex:1;min-height:20px}
+.px-cursor{display:inline-block;width:2px;height:14px;background:rgba(196,113,74,.9);margin-left:1px;vertical-align:middle;animation:blink 1s step-end infinite}
+.px-sbtn{font-family:'Geist',sans-serif;font-size:.7rem;font-weight:500;background:var(--accent);color:#f7f0e6;border:none;padding:.35rem .9rem;border-radius:5px;cursor:pointer;flex-shrink:0}
 .px-fetch-row{display:flex;gap:6px;align-items:center;margin-bottom:1.1rem;transition:opacity .4s}
-.px-fdot{width:6px;height:6px;border-radius:50%;background:rgba(200,80,26,.7);animation:fpop 1.2s ease infinite}
+.px-fdot{width:6px;height:6px;border-radius:50%;background:rgba(196,113,74,.7);animation:fpop 1.2s ease infinite}
 .px-fdot:nth-child(2){animation-delay:.2s}.px-fdot:nth-child(3){animation-delay:.4s}
-.px-flbl{font-size:.63rem;color:rgba(255,255,255,.26);font-family:'Geist',sans-serif;letter-spacing:.04em}
+.px-flbl{font-size:.63rem;color:var(--ink3);font-family:'Geist',sans-serif;letter-spacing:.04em}
 .px-flow-area{display:flex;gap:1rem;align-items:flex-start}
 .px-flow-main{flex:1;min-width:0}
 .px-flow-side{width:220px;flex-shrink:0}
-.px-abox{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:.9rem 1rem}
-.px-albl{font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(200,80,26,.75);margin-bottom:.7rem;font-family:'Geist',sans-serif;display:flex;align-items:center;gap:6px}
-.px-albl::before{content:'';width:5px;height:5px;border-radius:50%;background:#c8501a;display:inline-block;animation:bpulse 1.5s infinite}
-.px-atxt{font-size:.78rem;color:rgba(255,255,255,.62);font-family:'Geist',sans-serif;font-weight:300;line-height:1.75}
+.px-abox{background:#faf5ec;border:1px solid rgba(44,31,20,.07);border-radius:7px;padding:.9rem 1rem}
+.px-albl{font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(196,113,74,.85);margin-bottom:.7rem;font-family:'Geist',sans-serif;display:flex;align-items:center;gap:6px}
+.px-albl::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent);display:inline-block;animation:bpulse 1.5s infinite}
+.px-atxt{font-size:.78rem;color:var(--ink2);font-family:'Geist',sans-serif;font-weight:300;line-height:1.75}
 .px-aword{opacity:0;display:inline}
 .px-aword.show{animation:win .15s ease forwards}
-.px-spanel{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:.85rem}
-.px-slbl{font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:.75rem;font-family:'Geist',sans-serif}
-.px-sitem{display:flex;align-items:center;gap:8px;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.04);opacity:0;transform:translateX(8px);transition:opacity .4s,transform .4s}
+.px-spanel{background:#faf5ec;border:1px solid rgba(44,31,20,.07);border-radius:7px;padding:.85rem}
+.px-slbl{font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:.75rem;font-family:'Geist',sans-serif}
+.px-sitem{display:flex;align-items:center;gap:8px;padding:.4rem 0;border-bottom:1px solid rgba(44,31,20,.05);opacity:0;transform:translateX(8px);transition:opacity .4s,transform .4s}
 .px-sitem.show{opacity:1;transform:translateX(0)}
 .px-sitem:last-child{border-bottom:none}
 .px-sfav{width:16px;height:16px;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.52rem;font-weight:700;color:#fff;font-family:'Geist',sans-serif}
-.px-sdom{font-size:.6rem;color:rgba(255,255,255,.52);font-family:'Geist',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.px-stitl{font-size:.56rem;color:rgba(255,255,255,.26);font-family:'Geist',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.px-sdom{font-size:.6rem;color:var(--ink2);font-family:'Geist',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.px-stitl{font-size:.56rem;color:var(--ink3);font-family:'Geist',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .px-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:.8rem}
-.px-chip{font-size:.6rem;font-family:'Geist',sans-serif;background:rgba(200,80,26,.1);color:rgba(200,80,26,.85);border:1px solid rgba(200,80,26,.2);padding:.2rem .55rem;border-radius:4px;opacity:0;transition:opacity .3s}
+.px-chip{font-size:.6rem;font-family:'Geist',sans-serif;background:rgba(196,113,74,.1);color:rgba(196,113,74,.9);border:1px solid rgba(196,113,74,.22);padding:.2rem .55rem;border-radius:4px;opacity:0;transition:opacity .3s}
 .px-chip.show{opacity:1}
 
 .px-page{max-width:1200px;margin:0 auto;border-left:1px dashed var(--dash);border-right:1px dashed var(--dash)}
@@ -113,7 +113,7 @@ body{font-family:'Geist',sans-serif;background:var(--paper);color:var(--ink);ove
 .px-graph-intro h2 em{font-style:italic;color:var(--ink3)}
 .px-graph-intro p{font-size:.85rem;color:var(--ink3);line-height:1.75;font-weight:300}
 .px-graph-cell{background:var(--paper2);position:relative;overflow:hidden;min-height:500px}
-.px-graph-cell::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(15,13,11,0.11) 1px,transparent 1px);background-size:24px 24px;pointer-events:none;z-index:0}
+.px-graph-cell::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(44,31,20,0.09) 1px,transparent 1px);background-size:24px 24px;pointer-events:none;z-index:0}
 .px-graph-canvas{display:block;width:100%;height:100%;position:absolute;inset:0;z-index:1}
 
 .px-feat-bento{display:grid;grid-template-columns:1fr 2fr;border-bottom:1px dashed var(--dash)}
@@ -129,7 +129,6 @@ body{font-family:'Geist',sans-serif;background:var(--paper);color:var(--ink);ove
 .px-feat-item h3{font-family:'Libre Baskerville',serif;font-size:1rem;color:var(--ink);margin-bottom:.5rem;letter-spacing:-.01em}
 .px-feat-item p{font-size:.82rem;color:var(--ink3);line-height:1.7;font-weight:300}
 
-/* FEATURES DEEP */
 .px-features-section{border-top:1px dashed var(--dash)}
 .px-features-hero{padding:5rem 3rem 4rem;border-bottom:1px dashed var(--dash);display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
 .px-features-hero-left h2{font-family:'Libre Baskerville',serif;font-size:clamp(1.8rem,3vw,2.6rem);line-height:1.15;letter-spacing:-.03em;color:var(--ink);margin-bottom:1.25rem;margin-top:.75rem}
@@ -137,8 +136,8 @@ body{font-family:'Geist',sans-serif;background:var(--paper);color:var(--ink);ove
 .px-features-hero-left p{font-size:.88rem;color:var(--ink3);font-weight:300;line-height:1.8}
 .px-feat-pill-row{display:flex;flex-direction:column;gap:.9rem}
 .px-feat-pill{display:flex;align-items:center;gap:1rem;background:var(--paper2);border:1px dashed var(--dash);border-radius:10px;padding:1rem 1.25rem;transition:border-color .2s,background .2s;cursor:default}
-.px-feat-pill:hover{background:var(--paper3);border-color:rgba(200,80,26,.3)}
-.px-feat-pill-icon{width:34px;height:34px;border-radius:8px;background:rgba(200,80,26,.1);border:1px solid rgba(200,80,26,.2);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.px-feat-pill:hover{background:var(--paper3);border-color:rgba(196,113,74,.3)}
+.px-feat-pill-icon{width:34px;height:34px;border-radius:8px;background:rgba(196,113,74,.1);border:1px solid rgba(196,113,74,.2);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
 .px-feat-pill-text h4{font-family:'Geist',sans-serif;font-size:.82rem;font-weight:500;color:var(--ink);margin-bottom:.18rem}
 .px-feat-pill-text p{font-size:.72rem;color:var(--ink3);line-height:1.45;font-weight:300}
 .px-deep-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px dashed var(--dash)}
@@ -150,7 +149,6 @@ body{font-family:'Geist',sans-serif;background:var(--paper);color:var(--ink);ove
 .px-deep-cell h4{font-family:'Libre Baskerville',serif;font-size:.93rem;color:var(--ink);margin-bottom:.45rem}
 .px-deep-cell p{font-size:.77rem;color:var(--ink3);line-height:1.7;font-weight:300}
 
-/* PRICING */
 .px-pricing-wrap{padding:5rem 3rem}
 .px-pricing-top{text-align:center;margin-bottom:4rem}
 .px-pricing-top h2{font-family:'Libre Baskerville',serif;font-size:clamp(2rem,3.5vw,3rem);line-height:1.1;letter-spacing:-.03em;color:var(--ink);margin-bottom:1rem;margin-top:.75rem}
@@ -160,40 +158,39 @@ body{font-family:'Geist',sans-serif;background:var(--paper);color:var(--ink);ove
 .px-toggle-lbl{font-size:.78rem;color:var(--ink3);font-family:'Geist',sans-serif}
 .px-toggle{width:42px;height:24px;background:var(--paper3);border:1px solid var(--dash);border-radius:999px;position:relative;cursor:pointer;transition:background .2s}
 .px-toggle.on{background:var(--accent)}
-.px-toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.px-toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .px-toggle.on .px-toggle-thumb{transform:translateX(18px)}
-.px-save-badge{font-size:.62rem;background:rgba(200,80,26,.1);color:var(--accent);border:1px solid rgba(200,80,26,.2);border-radius:999px;padding:.2rem .6rem;font-family:'Geist',sans-serif;font-weight:500}
+.px-save-badge{font-size:.62rem;background:rgba(196,113,74,.1);color:var(--accent);border:1px solid rgba(196,113,74,.22);border-radius:999px;padding:.2rem .6rem;font-family:'Geist',sans-serif;font-weight:500}
 .px-plans{display:grid;grid-template-columns:repeat(3,1fr);border:1px dashed var(--dash);border-radius:12px;overflow:hidden}
 .px-plan{padding:2.5rem 2rem;border-right:1px dashed var(--dash);transition:background .2s}
 .px-plan:last-child{border-right:none}
 .px-plan:hover{background:var(--paper2)}
-.px-plan.featured{background:var(--ink)}
-.px-plan.featured:hover{background:#1a1714}
-.px-plan-badge{display:inline-block;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;background:rgba(200,80,26,.12);color:var(--accent2);border:1px solid rgba(200,80,26,.22);border-radius:999px;padding:.2rem .65rem;margin-bottom:1.25rem;font-family:'Geist',sans-serif}
-.px-plan.featured .px-plan-badge{background:rgba(200,80,26,.25);color:#ffb899;border-color:rgba(200,80,26,.4)}
+.px-plan.featured{background:#3d2415}
+.px-plan.featured:hover{background:#331d10}
+.px-plan-badge{display:inline-block;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;background:rgba(196,113,74,.12);color:var(--accent2);border:1px solid rgba(196,113,74,.22);border-radius:999px;padding:.2rem .65rem;margin-bottom:1.25rem;font-family:'Geist',sans-serif}
+.px-plan.featured .px-plan-badge{background:rgba(196,113,74,.25);color:#f0c4a0;border-color:rgba(196,113,74,.4)}
 .px-plan-name{font-family:'Libre Baskerville',serif;font-size:1.1rem;color:var(--ink);margin-bottom:.5rem}
-.px-plan.featured .px-plan-name{color:#e8dcc8}
+.px-plan.featured .px-plan-name{color:#ecdcc8}
 .px-plan-price{font-family:'Libre Baskerville',serif;font-size:2.6rem;letter-spacing:-.04em;color:var(--ink);line-height:1;margin-bottom:.35rem}
-.px-plan.featured .px-plan-price{color:#f7f4ef}
+.px-plan.featured .px-plan-price{color:#f5ede0}
 .px-plan-price sup{font-size:1rem;vertical-align:super}
 .px-plan-price sub{font-size:.75rem;font-family:'Geist',sans-serif;font-weight:300;letter-spacing:0;vertical-align:baseline}
 .px-plan-desc{font-size:.77rem;color:var(--ink3);font-weight:300;line-height:1.65;margin-bottom:1.75rem}
-.px-plan.featured .px-plan-desc{color:rgba(232,220,200,.45)}
+.px-plan.featured .px-plan-desc{color:rgba(236,220,200,.45)}
 .px-plan-divider{border:none;border-top:1px dashed var(--dash);margin-bottom:1.5rem}
 .px-plan.featured .px-plan-divider{border-color:rgba(255,255,255,.07)}
 .px-plan-features{list-style:none;display:flex;flex-direction:column;gap:.6rem;margin-bottom:2rem}
 .px-plan-features li{font-size:.77rem;color:var(--ink2);font-family:'Geist',sans-serif;display:flex;align-items:flex-start;gap:.55rem;line-height:1.45}
-.px-plan.featured .px-plan-features li{color:rgba(232,220,200,.65)}
+.px-plan.featured .px-plan-features li{color:rgba(236,220,200,.65)}
 .px-feat-check{color:var(--accent);font-size:.68rem;margin-top:.1rem;flex-shrink:0}
-.px-plan.featured .px-feat-check{color:#e8703a}
+.px-plan.featured .px-feat-check{color:var(--accent2)}
 .px-plan-btn{width:100%;font-family:'Geist',sans-serif;font-size:.82rem;font-weight:500;padding:.7rem 1rem;border-radius:7px;cursor:pointer;transition:all .2s;border:1px solid var(--dash);background:none;color:var(--ink)}
 .px-plan-btn:hover{background:var(--paper3)}
-.px-plan.featured .px-plan-btn{background:var(--accent);border-color:var(--accent);color:#fff}
-.px-plan.featured .px-plan-btn:hover{background:#a84016}
+.px-plan.featured .px-plan-btn{background:var(--accent);border-color:var(--accent);color:#f7f0e6}
+.px-plan.featured .px-plan-btn:hover{background:#a85c38}
 .px-pricing-note{text-align:center;margin-top:1.75rem;font-size:.74rem;color:var(--ink3);font-weight:300}
 .px-pricing-note a{color:var(--accent);text-decoration:none}
 
-/* BLOG */
 .px-blog-header{padding:5rem 3rem 3.5rem;border-bottom:1px dashed var(--dash);display:flex;align-items:flex-end;justify-content:space-between;gap:2rem}
 .px-blog-header-left h2{font-family:'Libre Baskerville',serif;font-size:clamp(1.8rem,3vw,2.8rem);line-height:1.1;letter-spacing:-.03em;color:var(--ink);margin-top:.75rem}
 .px-blog-header-left h2 em{font-style:italic;color:var(--ink3)}
@@ -207,7 +204,7 @@ body{font-family:'Geist',sans-serif;background:var(--paper);color:var(--ink);ove
 .px-blog-main h3{font-family:'Libre Baskerville',serif;font-size:1.55rem;line-height:1.25;letter-spacing:-.025em;color:var(--ink);margin-bottom:1rem}
 .px-blog-main>p{font-size:.87rem;color:var(--ink3);line-height:1.8;font-weight:300;margin-bottom:1.5rem;max-width:480px}
 .px-post-meta{display:flex;align-items:center;gap:.85rem;font-size:.7rem;color:var(--ink3);font-family:'Geist',sans-serif}
-.px-post-avatar{width:24px;height:24px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;font-size:.58rem;color:#f7f4ef;font-weight:600;flex-shrink:0}
+.px-post-avatar{width:24px;height:24px;border-radius:50%;background:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:.58rem;color:#f7f0e6;font-weight:600;flex-shrink:0}
 .px-post-meta-sep{width:3px;height:3px;border-radius:50%;background:var(--ink3);flex-shrink:0}
 .px-blog-side{display:flex;flex-direction:column}
 .px-blog-small{padding:2rem;border-bottom:1px dashed var(--dash);cursor:pointer;transition:background .2s;flex:1}
@@ -222,7 +219,6 @@ body{font-family:'Geist',sans-serif;background:var(--paper);color:var(--ink);ove
 .px-blog-card h4{font-family:'Libre Baskerville',serif;font-size:.92rem;line-height:1.35;color:var(--ink);margin-bottom:.6rem}
 .px-blog-card>p{font-size:.74rem;color:var(--ink3);line-height:1.65;font-weight:300;margin-bottom:1rem}
 
-/* DOCS */
 .px-docs-layout{display:grid;grid-template-columns:240px 1fr;min-height:70vh}
 .px-docs-sidebar{padding:2.5rem 1.5rem;border-right:1px dashed var(--dash);position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto}
 .px-docs-sidebar-title{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:1.25rem;font-family:'Geist',sans-serif}
@@ -230,7 +226,7 @@ body{font-family:'Geist',sans-serif;background:var(--paper);color:var(--ink);ove
 .px-docs-nav-group-label{font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:.55rem;font-family:'Geist',sans-serif;padding:.1rem 0}
 .px-docs-nav-item{display:flex;align-items:center;gap:8px;font-size:.77rem;color:var(--ink2);font-family:'Geist',sans-serif;padding:.38rem .6rem;border-radius:5px;cursor:pointer;transition:background .15s,color .15s;font-weight:300}
 .px-docs-nav-item:hover{background:var(--paper2);color:var(--ink)}
-.px-docs-nav-item.active{background:rgba(200,80,26,.08);color:var(--accent);font-weight:500}
+.px-docs-nav-item.active{background:rgba(196,113,74,.08);color:var(--accent);font-weight:500}
 .px-docs-nav-dot{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.4;flex-shrink:0}
 .px-docs-main{padding:3.5rem 3rem}
 .px-docs-breadcrumb{font-size:.7rem;color:var(--ink3);font-family:'Geist',sans-serif;margin-bottom:1.75rem;display:flex;align-items:center;gap:.45rem}
@@ -239,27 +235,24 @@ body{font-family:'Geist',sans-serif;background:var(--paper);color:var(--ink);ove
 .px-docs-main>p{font-size:.88rem;color:var(--ink3);line-height:1.8;font-weight:300;margin-bottom:2.25rem;max-width:580px}
 .px-docs-quickstart{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:2.5rem}
 .px-docs-card{background:var(--paper2);border:1px dashed var(--dash);border-radius:8px;padding:1.4rem;cursor:pointer;transition:border-color .2s,background .2s}
-.px-docs-card:hover{border-color:rgba(200,80,26,.4);background:var(--paper3)}
+.px-docs-card:hover{border-color:rgba(196,113,74,.4);background:var(--paper3)}
 .px-docs-card-icon{font-size:1.15rem;margin-bottom:.7rem}
 .px-docs-card h4{font-family:'Libre Baskerville',serif;font-size:.88rem;color:var(--ink);margin-bottom:.35rem}
 .px-docs-card p{font-size:.73rem;color:var(--ink3);line-height:1.6;font-weight:300}
 .px-docs-divider{border:none;border-top:1px dashed var(--dash);margin:2.25rem 0}
 .px-docs-step-list{display:flex;flex-direction:column;gap:1.4rem;margin-bottom:2.25rem}
 .px-docs-step{display:flex;gap:1rem}
-.px-docs-step-num{width:26px;height:26px;border-radius:50%;background:rgba(200,80,26,.1);border:1px solid rgba(200,80,26,.25);display:flex;align-items:center;justify-content:center;font-size:.63rem;font-weight:600;color:var(--accent);font-family:'Geist',sans-serif;flex-shrink:0;margin-top:.05rem}
+.px-docs-step-num{width:26px;height:26px;border-radius:50%;background:rgba(196,113,74,.1);border:1px solid rgba(196,113,74,.25);display:flex;align-items:center;justify-content:center;font-size:.63rem;font-weight:600;color:var(--accent);font-family:'Geist',sans-serif;flex-shrink:0;margin-top:.05rem}
 .px-docs-step h4{font-family:'Geist',sans-serif;font-size:.84rem;font-weight:500;color:var(--ink);margin-bottom:.3rem}
 .px-docs-step p{font-size:.77rem;color:var(--ink3);line-height:1.65;font-weight:300}
-.px-docs-code-block{background:var(--ink);border-radius:8px;overflow:hidden;margin-bottom:2rem}
+.px-docs-code-block{background:#2c1f14;border-radius:8px;overflow:hidden;margin-bottom:2rem}
 .px-docs-code-bar{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1rem;border-bottom:1px solid rgba(255,255,255,.06)}
 .px-docs-code-lang{font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.28);font-family:'Geist',sans-serif}
-.px-docs-code-copy{font-size:.62rem;color:rgba(200,80,26,.75);font-family:'Geist',sans-serif;background:none;border:none;cursor:pointer;transition:color .2s}
+.px-docs-code-copy{font-size:.62rem;color:rgba(196,113,74,.8);font-family:'Geist',sans-serif;background:none;border:none;cursor:pointer;transition:color .2s}
 .px-docs-code-copy:hover{color:var(--accent2)}
-.px-docs-code-body{padding:1.25rem 1.5rem;font-family:'Courier New',monospace;font-size:.77rem;line-height:1.85;color:rgba(232,220,200,.7);overflow-x:auto;white-space:pre}
-.px-kw{color:#e8703a}
-.px-str{color:#a8d8a8}
-.px-cm{color:rgba(255,255,255,.26);font-style:italic}
+.px-docs-code-body{padding:1.25rem 1.5rem;font-family:'Courier New',monospace;font-size:.77rem;line-height:1.85;color:rgba(230,210,185,.7);overflow-x:auto;white-space:pre}
+.px-kw{color:#d4896a}.px-str{color:#a8c8a0}.px-cm{color:rgba(255,255,255,.26);font-style:italic}
 
-/* CTA + FOOTER */
 .px-cta-bento{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px dashed var(--dash)}
 .px-cta-l{padding:5rem 3rem;border-right:1px dashed var(--dash);display:flex;align-items:center}
 .px-cta-l h2{font-family:'Libre Baskerville',serif;font-size:clamp(2rem,3.5vw,3rem);line-height:1.1;letter-spacing:-.03em;color:var(--ink)}
@@ -267,7 +260,7 @@ body{font-family:'Geist',sans-serif;background:var(--paper);color:var(--ink);ove
 .px-cta-r{padding:5rem 3rem;display:flex;flex-direction:column;justify-content:center}
 .px-cta-r>p{font-size:1rem;color:var(--ink3);font-weight:300;line-height:1.7;margin-bottom:2rem}
 .px-cta-acts{display:flex;gap:1rem;flex-wrap:wrap}
-.px-btn-ac{font-family:'Geist',sans-serif;font-size:.875rem;font-weight:500;background:var(--accent);color:#fff;border:none;padding:.75rem 1.75rem;cursor:pointer;border-radius:6px;transition:background .2s}
+.px-btn-ac{font-family:'Geist',sans-serif;font-size:.875rem;font-weight:500;background:var(--accent);color:#f7f0e6;border:none;padding:.75rem 1.75rem;cursor:pointer;border-radius:6px;transition:background .2s}
 .px-btn-ac:hover{background:var(--ink)}
 .px-btn-ol{font-family:'Geist',sans-serif;font-size:.875rem;background:none;color:var(--ink);border:1px dashed var(--dash);padding:.75rem 1.75rem;cursor:pointer;border-radius:6px;transition:border-color .2s}
 .px-btn-ol:hover{border-color:var(--ink3)}
@@ -284,7 +277,6 @@ body{font-family:'Geist',sans-serif;background:var(--paper);color:var(--ink);ove
 .px-footer-copy{font-size:.68rem;color:var(--ink3)}
 `;
 
-// ─────────────────────────────────────────────────────────────────────────────
 function AsciiCanvas() {
   const cvRef = useRef(null);
   useEffect(() => {
@@ -302,28 +294,40 @@ function AsciiCanvas() {
       const cols = Math.floor(cw / CELL), rows = Math.floor(ch / CELL);
       const off = document.createElement("canvas"); off.width = cw; off.height = ch;
       const octx = off.getContext("2d");
-      octx.fillStyle = "#000"; octx.fillRect(0, 0, cw, ch);
+      octx.fillStyle = "#ffffff"; octx.fillRect(0, 0, cw, ch);
       const fs = Math.floor(ch * 0.80);
       octx.font = `italic 900 ${fs}px 'Libre Baskerville',Georgia,serif`;
-      octx.textAlign = "center"; octx.textBaseline = "middle"; octx.fillStyle = "#fff";
+      octx.textAlign = "center"; octx.textBaseline = "middle"; octx.fillStyle = "#000";
       octx.fillText("Purplex", cw / 2, ch / 2 + fs * 0.04);
       const { data } = octx.getImageData(0, 0, cw, ch);
       grid = [];
       for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
         const px = Math.min(Math.round(c * CELL + CELL/2), cw-1), py = Math.min(Math.round(r * CELL + CELL/2), ch-1);
-        const b = data[(py * cw + px) * 4] / 255;
-        if (b < 0.05) continue;
-        const a = b > 0.6 ? 0.78 + Math.random() * 0.18 : b > 0.25 ? 0.4 + b * 0.55 : 0.12 + b * 0.5;
-        grid.push({ c, r, brightness: b, baseAlpha: a, char: ALL[Math.floor(Math.random() * ALL.length)], timer: Math.floor(Math.random() * 40), flipSpeed: 8 + Math.floor(Math.random() * 32) });
+        const darkness = 1 - data[(py * cw + px) * 4] / 255;
+        if (darkness < 0.04) continue;
+        // Sepia-toned: muted warm terracotta, less saturated
+        const a = darkness > 0.55
+          ? 0.82 + Math.random() * 0.12
+          : darkness > 0.20
+          ? 0.50 + darkness * 0.50
+          : 0.22 + darkness * 1.1;
+        grid.push({ c, r, darkness, baseAlpha: Math.min(a, 1), char: ALL[Math.floor(Math.random() * ALL.length)], timer: Math.floor(Math.random() * 40), flipSpeed: 8 + Math.floor(Math.random() * 32) });
       }
     }
     function draw() {
       ctx.clearRect(0, 0, cw, ch);
       ctx.font = `bold ${CELL}px 'Courier New',monospace`; ctx.textAlign = "left"; ctx.textBaseline = "top";
       for (const cell of grid) {
-        if (--cell.timer <= 0) { cell.timer = cell.flipSpeed + Math.floor(Math.random() * cell.flipSpeed); cell.char = ALL[Math.floor(Math.random() * ALL.length)]; }
-        const { brightness: b, baseAlpha: a } = cell;
-        ctx.fillStyle = `rgba(${Math.round(Math.min(255,180+b*55))},${Math.round(45+b*35)},${Math.round(8+b*10)},${a.toFixed(3)})`;
+        if (--cell.timer <= 0) {
+          cell.timer = cell.flipSpeed + Math.floor(Math.random() * cell.flipSpeed);
+          cell.char = ALL[Math.floor(Math.random() * ALL.length)];
+        }
+        const { darkness: d, baseAlpha: a } = cell;
+        // Sepia terracotta: core ~#c4714a, dim edges ~#a05a38 — muted & warm
+        const rC = Math.round(180 + d * 36);   // 180→216
+        const gC = Math.round(90 + d * 28);    // 90→118
+        const bC = Math.round(55 + d * 20);    // 55→75
+        ctx.fillStyle = `rgba(${rC},${gC},${bC},${a.toFixed(3)})`;
         ctx.fillText(cell.char, cell.c * CELL, cell.r * CELL);
       }
       rafId = requestAnimationFrame(draw);
@@ -357,11 +361,18 @@ function GraphCanvas() {
       constructor(ek, to) { this.ek=ek; this.from=nodes[ek[0]]; this.to=nodes[ek[1]]; this.t=to; this.spd=0.004+Math.random()*0.003; this.trail=[]; }
       nextEdge() { const o=adj[this.ek[1]]||[]; return o.length?[this.ek[1],o[Math.floor(Math.random()*o.length)]]:null; }
       update() { this.t+=this.spd; const x=this.from.x+(this.to.x-this.from.x)*Math.min(this.t,1),y=this.from.y+(this.to.y-this.from.y)*Math.min(this.t,1); this.trail.push({x,y}); if(this.trail.length>TRAIL)this.trail.shift(); if(this.t>=1){const n=this.nextEdge();if(n){this.ek=n;this.from=nodes[n[0]];this.to=nodes[n[1]];}this.t=0;this.trail=[];} }
-      draw() { if(this.trail.length<2)return; for(let i=1;i<this.trail.length;i++){const a=i/this.trail.length;ctx.beginPath();ctx.moveTo(this.trail[i-1].x,this.trail[i-1].y);ctx.lineTo(this.trail[i].x,this.trail[i].y);ctx.strokeStyle=`rgba(200,80,26,${(a*.7).toFixed(3)})`;ctx.lineWidth=1.8*a;ctx.lineCap="round";ctx.stroke();} const h=this.trail[this.trail.length-1];ctx.beginPath();ctx.arc(h.x,h.y,3,0,Math.PI*2);ctx.fillStyle="#c8501a";ctx.fill();ctx.beginPath();ctx.arc(h.x,h.y,1.4,0,Math.PI*2);ctx.fillStyle="#fff";ctx.fill(); }
+      // Sepia-toned particles: muted terracotta
+      draw() { if(this.trail.length<2)return; for(let i=1;i<this.trail.length;i++){const a=i/this.trail.length;ctx.beginPath();ctx.moveTo(this.trail[i-1].x,this.trail[i-1].y);ctx.lineTo(this.trail[i].x,this.trail[i].y);ctx.strokeStyle=`rgba(180,100,65,${(a*.65).toFixed(3)})`;ctx.lineWidth=1.8*a;ctx.lineCap="round";ctx.stroke();} const h=this.trail[this.trail.length-1];ctx.beginPath();ctx.arc(h.x,h.y,3,0,Math.PI*2);ctx.fillStyle="#b46441";ctx.fill();ctx.beginPath();ctx.arc(h.x,h.y,1.4,0,Math.PI*2);ctx.fillStyle="#f7f0e6";ctx.fill(); }
     }
     function spawn() { particles.length=0; const n=edges.length; for(let i=0;i<28;i++)particles.push(new P(edges[i%n],i/28)); }
     spawn();
-    function loop() { ctx.clearRect(0,0,W(),H()); pulseT+=0.025; edges.forEach(([f,t])=>{const fn=nodes[f],tn=nodes[t];ctx.beginPath();ctx.moveTo(fn.x,fn.y);ctx.lineTo(tn.x,tn.y);ctx.strokeStyle="rgba(15,13,11,0.2)";ctx.lineWidth=1;ctx.setLineDash([4,6]);ctx.stroke();ctx.setLineDash([]);}); particles.forEach(p=>{p.update();p.draw();}); Object.values(nodes).forEach(n=>{const ps=1+Math.sin(pulseT+n.x*.01)*.4;ctx.beginPath();ctx.arc(n.x,n.y,(n.r+5)*ps,0,Math.PI*2);ctx.fillStyle="rgba(200,80,26,0.08)";ctx.fill();ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);ctx.fillStyle="rgba(15,13,11,0.78)";ctx.fill();ctx.beginPath();ctx.arc(n.x,n.y,n.r+2.5,0,Math.PI*2);ctx.strokeStyle="rgba(58,53,48,0.7)";ctx.lineWidth=.75;ctx.setLineDash([2,3]);ctx.stroke();ctx.setLineDash([]);ctx.font="300 10px 'Geist',sans-serif";ctx.fillStyle="rgba(58,53,48,0.95)";ctx.textAlign="center";ctx.textBaseline="bottom";ctx.fillText(n.label,n.x,n.y-n.r-4);}); rafId=requestAnimationFrame(loop); }
+    function loop() {
+      ctx.clearRect(0,0,W(),H()); pulseT+=0.025;
+      edges.forEach(([f,t])=>{const fn=nodes[f],tn=nodes[t];ctx.beginPath();ctx.moveTo(fn.x,fn.y);ctx.lineTo(tn.x,tn.y);ctx.strokeStyle="rgba(44,31,20,0.18)";ctx.lineWidth=1;ctx.setLineDash([4,6]);ctx.stroke();ctx.setLineDash([]);});
+      particles.forEach(p=>{p.update();p.draw();});
+      Object.values(nodes).forEach(n=>{const ps=1+Math.sin(pulseT+n.x*.01)*.4;ctx.beginPath();ctx.arc(n.x,n.y,(n.r+5)*ps,0,Math.PI*2);ctx.fillStyle="rgba(180,100,65,0.08)";ctx.fill();ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);ctx.fillStyle="rgba(60,40,25,0.78)";ctx.fill();ctx.beginPath();ctx.arc(n.x,n.y,n.r+2.5,0,Math.PI*2);ctx.strokeStyle="rgba(90,62,43,0.6)";ctx.lineWidth=.75;ctx.setLineDash([2,3]);ctx.stroke();ctx.setLineDash([]);ctx.font="300 10px 'Geist',sans-serif";ctx.fillStyle="rgba(90,62,43,0.9)";ctx.textAlign="center";ctx.textBaseline="bottom";ctx.fillText(n.label,n.x,n.y-n.r-4);});
+      rafId=requestAnimationFrame(loop);
+    }
     loop();
     const ro = new ResizeObserver(() => { resize(); buildGraph(); spawn(); }); ro.observe(wrap);
     return () => { cancelAnimationFrame(rafId); ro.disconnect(); };
@@ -370,9 +381,9 @@ function GraphCanvas() {
 }
 
 const QS = [
-  {q:"best AI search engine in 2026",a:"Purplex leads 2026 benchmarks with sub-300ms first-token latency. It reads live sources — not a frozen training snapshot — and returns a single cited answer instead of ten blue links.",s:[{bg:"#e34c26",l:"W",d:"wired.com",t:"Best AI search 2026"},{bg:"#0077b5",l:"L",d:"linkedin.com",t:"AI trends this quarter"},{bg:"#ff4500",l:"R",d:"reddit.com",t:"r/MachineLearning"},{bg:"#1a1a2e",l:"A",d:"arxiv.org",t:"RAG benchmarks 2026"},{bg:"#24292e",l:"G",d:"github.com",t:"vector-db benchmarks"}],ch:["wired.com","arxiv.org","linkedin.com"]},
-  {q:"how does RAG differ from fine-tuning?",a:"RAG retrieves external documents at inference time — no weights change. Fine-tuning bakes knowledge into weights permanently. RAG wins on freshness and cost; fine-tuning wins on latency.",s:[{bg:"#1a1a2e",l:"A",d:"arxiv.org",t:"RAG vs Fine-Tuning"},{bg:"#24292e",l:"G",d:"github.com",t:"llama-index examples"},{bg:"#ff6b35",l:"H",d:"huggingface.co",t:"PEFT vs RAG guide"},{bg:"#0077b5",l:"L",d:"linkedin.com",t:"LLM digest"},{bg:"#6f42c1",l:"O",d:"openai.com",t:"Fine-tuning cookbook"}],ch:["arxiv.org","huggingface.co","github.com"]},
-  {q:"what is vector similarity search?",a:"Vector similarity search finds nearest neighbours to a query embedding in high-dimensional space. HNSW and FAISS are the dominant index structures used in production RAG pipelines.",s:[{bg:"#1a1a2e",l:"A",d:"arxiv.org",t:"HNSW paper 2016"},{bg:"#24292e",l:"G",d:"github.com",t:"faiss — facebook"},{bg:"#e34c26",l:"W",d:"wired.com",t:"Vector DBs explained"},{bg:"#00897b",l:"P",d:"pinecone.io",t:"Pinecone index guide"},{bg:"#6f42c1",l:"C",d:"chroma.dev",t:"ChromaDB quickstart"}],ch:["arxiv.org","pinecone.io","faiss"]},
+  {q:"best AI search engine in 2026",a:"Purplex leads 2026 benchmarks with sub-300ms first-token latency. It reads live sources — not a frozen training snapshot — and returns a single cited answer instead of ten blue links.",s:[{bg:"#b05030",l:"W",d:"wired.com",t:"Best AI search 2026"},{bg:"#5a7fa0",l:"L",d:"linkedin.com",t:"AI trends this quarter"},{bg:"#c04a30",l:"R",d:"reddit.com",t:"r/MachineLearning"},{bg:"#3a2a1e",l:"A",d:"arxiv.org",t:"RAG benchmarks 2026"},{bg:"#2e3830",l:"G",d:"github.com",t:"vector-db benchmarks"}],ch:["wired.com","arxiv.org","linkedin.com"]},
+  {q:"how does RAG differ from fine-tuning?",a:"RAG retrieves external documents at inference time — no weights change. Fine-tuning bakes knowledge into weights permanently. RAG wins on freshness and cost; fine-tuning wins on latency.",s:[{bg:"#3a2a1e",l:"A",d:"arxiv.org",t:"RAG vs Fine-Tuning"},{bg:"#2e3830",l:"G",d:"github.com",t:"llama-index examples"},{bg:"#b06040",l:"H",d:"huggingface.co",t:"PEFT vs RAG guide"},{bg:"#5a7fa0",l:"L",d:"linkedin.com",t:"LLM digest"},{bg:"#6a5a90",l:"O",d:"openai.com",t:"Fine-tuning cookbook"}],ch:["arxiv.org","huggingface.co","github.com"]},
+  {q:"what is vector similarity search?",a:"Vector similarity search finds nearest neighbours to a query embedding in high-dimensional space. HNSW and FAISS are the dominant index structures used in production RAG pipelines.",s:[{bg:"#3a2a1e",l:"A",d:"arxiv.org",t:"HNSW paper 2016"},{bg:"#2e3830",l:"G",d:"github.com",t:"faiss — facebook"},{bg:"#b05030",l:"W",d:"wired.com",t:"Vector DBs explained"},{bg:"#3a7060",l:"P",d:"pinecone.io",t:"Pinecone index guide"},{bg:"#6a5a90",l:"C",d:"chroma.dev",t:"ChromaDB quickstart"}],ch:["arxiv.org","pinecone.io","faiss"]},
 ];
 const FETCH_STAGES = ["searching the web...","reading 5 sources...","cross-referencing...","synthesising answer..."];
 
@@ -435,7 +446,7 @@ function MacWindow() {
   return (
     <div className="px-mac-window">
       <div className="px-mac-bar">
-        <span className="px-mac-dot" style={{background:"#ff5f56"}}/><span className="px-mac-dot" style={{background:"#ffbd2e"}}/><span className="px-mac-dot" style={{background:"#27c93f"}}/>
+        <span className="px-mac-dot" style={{background:"#c0614a"}}/><span className="px-mac-dot" style={{background:"#c09040"}}/><span className="px-mac-dot" style={{background:"#60a060"}}/>
         <div className="px-mac-url"><span style={{fontSize:".6rem",opacity:.35}}>🔒</span>purplex.ai</div>
       </div>
       <div className="px-mac-content">
@@ -529,7 +540,6 @@ export default function Purplex() {
 
   return (
     <>
-      {/* NAV */}
       <nav className="px-nav">
         <a className="px-logo" href="#" onClick={e=>{e.preventDefault();window.scrollTo({top:0,behavior:"smooth"});}}>
           <div className="px-logo-mark">P</div>purplex
@@ -539,12 +549,8 @@ export default function Purplex() {
             <button onClick={e=>navToggle(e,"features")}>Features <span className="px-chevron">▾</span></button>
             {openNav==="features" && <Dropdown items={FEAT_DROPDOWN}/>}
           </li>
-          <li className="px-nav-item">
-            <a href="#" onClick={e=>{e.preventDefault();scrollTo("pricing");}}>Pricing</a>
-          </li>
-          <li className="px-nav-item">
-            <a href="#" onClick={e=>{e.preventDefault();scrollTo("blog");}}>Blog</a>
-          </li>
+          <li className="px-nav-item"><a href="#" onClick={e=>{e.preventDefault();scrollTo("pricing");}}>Pricing</a></li>
+          <li className="px-nav-item"><a href="#" onClick={e=>{e.preventDefault();scrollTo("blog");}}>Blog</a></li>
           <li className={`px-nav-item${openNav==="docs"?" open":""}`}>
             <button onClick={e=>navToggle(e,"docs")}>Docs <span className="px-chevron">▾</span></button>
             {openNav==="docs" && <Dropdown items={DOCS_DROPDOWN}/>}
@@ -556,7 +562,6 @@ export default function Purplex() {
         </div>
       </nav>
 
-      {/* HERO */}
       <div className="px-hero-wrap">
         <AsciiCanvas/>
         <div className="px-hero-inner">
@@ -573,7 +578,6 @@ export default function Purplex() {
         </div>
       </div>
 
-      {/* STATS + MARQUEE + GRAPH + FEATURES GRID */}
       <div style={{background:"var(--paper)"}}>
         <div className="px-page">
           <div className="px-stats-bento">
@@ -610,7 +614,6 @@ export default function Purplex() {
         </div>
       </div>
 
-      {/* FEATURES (full section) */}
       <div id="features" style={{background:"var(--paper)"}}>
         <div className="px-page px-features-section">
           <div className="px-features-hero">
@@ -636,7 +639,6 @@ export default function Purplex() {
         </div>
       </div>
 
-      {/* PRICING */}
       <div id="pricing" style={{background:"var(--paper)"}}>
         <div className="px-page" style={{borderTop:"1px dashed var(--dash)"}}>
           <div className="px-pricing-wrap">
@@ -646,9 +648,7 @@ export default function Purplex() {
               <p>Start free. Scale without surprises. No seat fees, no hidden retrieval costs.</p>
               <div className="px-toggle-row">
                 <span className="px-toggle-lbl">Monthly</span>
-                <div className={`px-toggle${annual?" on":""}`} onClick={()=>setAnnual(p=>!p)}>
-                  <div className="px-toggle-thumb"/>
-                </div>
+                <div className={`px-toggle${annual?" on":""}`} onClick={()=>setAnnual(p=>!p)}><div className="px-toggle-thumb"/></div>
                 <span className="px-toggle-lbl">Annual</span>
                 {annual && <span className="px-save-badge">Save 20%</span>}
               </div>
@@ -662,16 +662,10 @@ export default function Purplex() {
                 <div key={i} className={`px-plan${plan.featured?" featured":""}`}>
                   <div className="px-plan-badge">{plan.badge}</div>
                   <div className="px-plan-name">{plan.name}</div>
-                  <div className="px-plan-price">
-                    {plan.price===null ? "Free" : <><sup>$</sup>{plan.price}<sub>{annual?" /mo billed ann.":" /mo"}</sub></>}
-                  </div>
+                  <div className="px-plan-price">{plan.price===null?"Free":<><sup>$</sup>{plan.price}<sub>{annual?" /mo billed ann.":" /mo"}</sub></>}</div>
                   <div className="px-plan-desc">{plan.desc}</div>
                   <hr className="px-plan-divider"/>
-                  <ul className="px-plan-features">
-                    {plan.features.map((f,fi)=>(
-                      <li key={fi}><span className="px-feat-check">✓</span>{f}</li>
-                    ))}
-                  </ul>
+                  <ul className="px-plan-features">{plan.features.map((f,fi)=><li key={fi}><span className="px-feat-check">✓</span>{f}</li>)}</ul>
                   <button className="px-plan-btn">{plan.btn}</button>
                 </div>
               ))}
@@ -681,7 +675,6 @@ export default function Purplex() {
         </div>
       </div>
 
-      {/* BLOG */}
       <div id="blog" style={{background:"var(--paper)"}}>
         <div className="px-page" style={{borderTop:"1px dashed var(--dash)"}}>
           <div className="px-blog-header">
@@ -696,41 +689,26 @@ export default function Purplex() {
               <div className="px-post-cat"><span className="px-post-cat-dot"/>Engineering</div>
               <h3>Why retrieval-augmented generation is finally production-ready in 2026</h3>
               <p>For years RAG was a research idea — great in demos, brittle in production. Here's what changed: latency, tooling, and a new generation of vector indices that actually scale.</p>
-              <div className="px-post-meta">
-                <div className="px-post-avatar">JK</div>
-                <span>James Kim</span><span className="px-post-meta-sep"/>
-                <span>May 8, 2026</span><span className="px-post-meta-sep"/>
-                <span>8 min read</span>
-              </div>
+              <div className="px-post-meta"><div className="px-post-avatar">JK</div><span>James Kim</span><span className="px-post-meta-sep"/><span>May 8, 2026</span><span className="px-post-meta-sep"/><span>8 min read</span></div>
             </div>
             <div className="px-blog-side">
               {[{cat:"Product",title:"Introducing deep reasoning mode",desc:"A new way to answer questions that require synthesising conflicting information across dozens of sources.",author:"Ana Reyes",date:"May 3"},{cat:"Research",title:"Benchmarking AI search in 2026",desc:"We ran 10,000 queries through seven AI search engines. Here's what the data says about accuracy and hallucination rates.",author:"Dev Patel",date:"Apr 28"}].map((post,i)=>(
                 <div key={i} className="px-blog-small">
                   <div className="px-post-cat"><span className="px-post-cat-dot"/>{post.cat}</div>
-                  <h4>{post.title}</h4>
-                  <p>{post.desc}</p>
-                  <div className="px-post-meta">
-                    <div className="px-post-avatar" style={{fontSize:".55rem"}}>{post.author.split(" ").map(w=>w[0]).join("")}</div>
-                    <span>{post.author}</span><span className="px-post-meta-sep"/><span>{post.date}</span>
-                  </div>
+                  <h4>{post.title}</h4><p>{post.desc}</p>
+                  <div className="px-post-meta"><div className="px-post-avatar" style={{fontSize:".55rem"}}>{post.author.split(" ").map(w=>w[0]).join("")}</div><span>{post.author}</span><span className="px-post-meta-sep"/><span>{post.date}</span></div>
                 </div>
               ))}
             </div>
           </div>
           <div className="px-blog-grid">
             {[{cat:"Tutorial",title:"Build a cited Q&A bot in 20 lines of JS",desc:"Walk through the Purplex API to build a fully cited, streaming question-answering widget.",date:"Apr 22"},{cat:"Opinion",title:"The search bar is the last UI that hasn't changed",desc:"We rebuilt search from first principles. Here's why the ten blue links model was never going to survive AI.",date:"Apr 15"},{cat:"Engineering",title:"How we hit sub-300ms p99 latency at scale",desc:"A deep dive into our streaming pipeline, edge caching strategy, and the trade-offs we made.",date:"Apr 9"}].map((card,i)=>(
-              <div key={i} className="px-blog-card">
-                <div className="px-post-cat"><span className="px-post-cat-dot"/>{card.cat}</div>
-                <h4>{card.title}</h4>
-                <p>{card.desc}</p>
-                <div className="px-post-meta"><span>{card.date}</span></div>
-              </div>
+              <div key={i} className="px-blog-card"><div className="px-post-cat"><span className="px-post-cat-dot"/>{card.cat}</div><h4>{card.title}</h4><p>{card.desc}</p><div className="px-post-meta"><span>{card.date}</span></div></div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* DOCS */}
       <div id="docs" style={{background:"var(--paper)"}}>
         <div className="px-page" style={{borderTop:"1px dashed var(--dash)"}}>
           <div className="px-docs-layout">
@@ -740,9 +718,7 @@ export default function Purplex() {
                 <div key={gi} className="px-docs-nav-group">
                   <div className="px-docs-nav-group-label">{group.group}</div>
                   {group.items.map((item,ii)=>(
-                    <div key={ii} className={`px-docs-nav-item${docsActive===item?" active":""}`} onClick={()=>setDocsActive(item)}>
-                      <span className="px-docs-nav-dot"/>{item}
-                    </div>
+                    <div key={ii} className={`px-docs-nav-item${docsActive===item?" active":""}`} onClick={()=>setDocsActive(item)}><span className="px-docs-nav-dot"/>{item}</div>
                   ))}
                 </div>
               ))}
@@ -753,26 +729,17 @@ export default function Purplex() {
               <p>Get up and running with Purplex in minutes. This guide walks you through installing the SDK, making your first search query, and understanding the response format.</p>
               <div className="px-docs-quickstart">
                 {[{icon:"📦",title:"Install the SDK",desc:"npm, pip, or plain REST — your choice."},{icon:"🔑",title:"Get your API key",desc:"Free tier, no credit card required."},{icon:"⚡",title:"Make your first query",desc:"One function call, one cited answer."},{icon:"📊",title:"Explore the dashboard",desc:"Analytics, logs, and usage in one place."}].map((card,i)=>(
-                  <div key={i} className="px-docs-card">
-                    <div className="px-docs-card-icon">{card.icon}</div>
-                    <h4>{card.title}</h4><p>{card.desc}</p>
-                  </div>
+                  <div key={i} className="px-docs-card"><div className="px-docs-card-icon">{card.icon}</div><h4>{card.title}</h4><p>{card.desc}</p></div>
                 ))}
               </div>
               <hr className="px-docs-divider"/>
               <div className="px-docs-step-list">
                 {[{n:"01",title:"Install",body:"Add the Purplex SDK to your project. Works with Node.js 18+, Python 3.10+, or any HTTP client via REST."},{n:"02",title:"Authenticate",body:"Create a free account at purplex.ai and copy your API key from the dashboard. Pass it as an environment variable."},{n:"03",title:"Query",body:"Call purplex.search() with your question. You'll receive a streaming response with the answer and full source citations."}].map((step,i)=>(
-                  <div key={i} className="px-docs-step">
-                    <div className="px-docs-step-num">{step.n}</div>
-                    <div><h4>{step.title}</h4><p>{step.body}</p></div>
-                  </div>
+                  <div key={i} className="px-docs-step"><div className="px-docs-step-num">{step.n}</div><div><h4>{step.title}</h4><p>{step.body}</p></div></div>
                 ))}
               </div>
               <div className="px-docs-code-block">
-                <div className="px-docs-code-bar">
-                  <span className="px-docs-code-lang">JavaScript</span>
-                  <button className="px-docs-code-copy" onClick={()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);}}>{copied?"Copied ✓":"Copy"}</button>
-                </div>
+                <div className="px-docs-code-bar"><span className="px-docs-code-lang">JavaScript</span><button className="px-docs-code-copy" onClick={()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);}}>{copied?"Copied ✓":"Copy"}</button></div>
                 <div className="px-docs-code-body">
                   <span className="px-cm">{"// Install: npm install purplex\n"}</span>
                   <span className="px-kw">import</span>{" Purplex "}<span className="px-kw">from</span>{" "}<span className="px-str">'purplex'</span>{";\n\n"}
@@ -786,44 +753,32 @@ export default function Purplex() {
         </div>
       </div>
 
-      {/* CTA */}
       <div style={{background:"var(--paper)"}}>
         <div className="px-page" style={{borderTop:"1px dashed var(--dash)"}}>
           <div className="px-cta-bento">
             <div className="px-cta-l"><h2>stop searching.<br/><em>start knowing.</em></h2></div>
             <div className="px-cta-r">
               <p>Purplex is free to start. No credit card. No setup. Drop one component and you're shipping AI-powered search in minutes.</p>
-              <div className="px-cta-acts">
-                <button className="px-btn-ac">Start for free</button>
-                <button className="px-btn-ol" onClick={()=>scrollTo("docs")}>Read the docs</button>
-              </div>
+              <div className="px-cta-acts"><button className="px-btn-ac">Start for free</button><button className="px-btn-ol" onClick={()=>scrollTo("docs")}>Read the docs</button></div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* FOOTER */}
       <div style={{background:"var(--paper2)",borderTop:"1px dashed var(--dash)"}}>
         <div className="px-page">
           <footer className="px-footer">
             <div className="px-footer-brand">
-              <div className="px-logo" style={{color:"var(--ink2)"}}>
-                <div className="px-logo-mark" style={{border:"1.5px dashed var(--dash)",color:"var(--ink2)"}}>P</div>purplex
-              </div>
+              <div className="px-logo" style={{color:"var(--ink2)"}}><div className="px-logo-mark" style={{border:"1.5px dashed var(--dash)",color:"var(--ink2)"}}>P</div>purplex</div>
               <p>The AI search layer for the modern web. Reasoned answers, full citations, zero hallucinations.</p>
             </div>
             <div className="px-footer-links-grid">
               {[{title:"Product",links:["Features","Pricing","Changelog","Roadmap"]},{title:"Developers",links:["Docs","API Reference","SDKs","Status"]},{title:"Company",links:["About","Blog","Careers","Press"]},{title:"Legal",links:["Privacy","Terms","Security","GDPR"]}].map((col,i)=>(
-                <div key={i} className="px-footer-col">
-                  <div className="px-footer-col-title">{col.title}</div>
-                  {col.links.map(l=><a key={l} href="#">{l}</a>)}
-                </div>
+                <div key={i} className="px-footer-col"><div className="px-footer-col-title">{col.title}</div>{col.links.map(l=><a key={l} href="#">{l}</a>)}</div>
               ))}
             </div>
             <div className="px-footer-right">
-              <div className="px-footer-socials">
-                {["𝕏","in","gh","▶"].map((s,i)=><button key={i} className="px-social-btn">{s}</button>)}
-              </div>
+              <div className="px-footer-socials">{["𝕏","in","gh","▶"].map((s,i)=><button key={i} className="px-social-btn">{s}</button>)}</div>
               <p className="px-footer-copy">© 2026 Purplex Inc. All rights reserved.</p>
             </div>
           </footer>
