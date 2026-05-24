@@ -1,568 +1,875 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 
-const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Geist:wght@300;400;500;600;700&display=swap');
+const CYAN = "#00d8ed";
+const CYAN_SOFT = "rgba(0,216,237,0.48)";
+const ACCENT = "#c8501a";
+const BG = "#070808";
+const PANEL = "#0d0e0f";
+const GRID = "rgba(255,255,255,0.012)";
+const TEXT_PRIMARY = "#e8dcc8";
+const TEXT_SECONDARY = "rgba(232,220,200,0.5)";
+const TEXT_MUTED = "rgba(232,220,200,0.28)";
+const BORDER = "rgba(255,255,255,0.07)";
+const BORDER_SOFT = "rgba(255,255,255,0.04)";
+const ACCENT_SOFT = "rgba(200,80,26,0.08)";
+const ACCENT_BORDER = "rgba(200,80,26,0.25)";
+const LINE = "rgba(255,255,255,0.12)";
 
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --acc:#00d4e8;--acc2:#26eeff;
-  --bg:#0b0a0a;--bg2:#080808;
-  --bd:rgba(255,255,255,0.08);
-  --t:#d8cfc4;--t2:rgba(216,207,196,0.5);--t3:rgba(216,207,196,0.22);
+const GLOBAL_CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Geist:wght@300;400;500;600&display=swap');
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: ${BG}; }
+
+@keyframes bpulse  { 0%,100%{opacity:1} 50%{opacity:.3} }
+@keyframes blink   { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes fadeIn  { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeUp  { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes tdot    { 0%,80%,100%{transform:scale(.7);opacity:.4} 40%{transform:scale(1);opacity:1} }
+
+@keyframes beamVertical {
+  0%   { top: -110px; opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { top: 100%; opacity: 1; }
+  100% { top: 100%; opacity: 0; }
 }
-html,body{height:100%;width:100%;background:var(--bg);color:var(--t);font-family:'Geist',sans-serif;overflow:hidden}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
-@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes tdot{0%,80%,100%{opacity:.2}40%{opacity:1}}
-
-.root{display:flex;height:100vh;width:100vw;overflow:hidden}
-
-/* SIDEBAR */
-.sb{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column;height:100vh;overflow:hidden;transition:width .26s cubic-bezier(.4,0,.2,1)}
-.sb.off{width:0;border-right:none}
-.sb-inner{width:220px;display:flex;flex-direction:column;height:100%;overflow:hidden}
-.sb-head{padding:.75rem .85rem .65rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.logo{font-family:'Libre Baskerville',serif;font-size:.95rem;color:var(--t);display:flex;align-items:center;gap:7px;letter-spacing:-.02em;cursor:pointer}
-.logo-mark{width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(0,212,232,.4);display:flex;align-items:center;justify-content:center;font-size:.5rem;font-weight:700;color:var(--acc2)}
-.ico-btn{width:22px;height:22px;background:none;border:1px solid var(--bd);color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
-.ico-btn:hover{background:rgba(255,255,255,.04);color:var(--t2)}
-.new-chat{margin:.6rem .65rem .3rem;background:rgba(0,212,232,.08);border:1px solid rgba(0,212,232,.22);padding:.48rem .8rem;font-size:.7rem;font-weight:500;color:var(--acc2);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .18s;font-family:'Geist',sans-serif;width:calc(100% - 1.3rem)}
-.new-chat:hover{background:rgba(0,212,232,.15);border-color:rgba(0,212,232,.36)}
-.sb-search{padding:.1rem .65rem .3rem;flex-shrink:0}
-.sb-search-inner{width:100%;background:rgba(255,255,255,.02);border:1px solid var(--bd);padding:.35rem .6rem;font-size:.66rem;color:var(--t3);display:flex;align-items:center;gap:5px}
-.chat-list{flex:1;overflow-y:auto;padding:.1rem .35rem .5rem}
-.chat-list::-webkit-scrollbar{width:2px}
-.chat-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06)}
-.sec-lbl{font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);padding:.45rem .45rem .18rem}
-.chat-row{display:flex;align-items:center;padding:.35rem .45rem;cursor:pointer;transition:background .12s;margin-bottom:1px;font-size:.69rem;color:var(--t2);font-weight:300}
-.chat-row:hover{background:rgba(255,255,255,.04);color:var(--t)}
-.chat-row.on{background:rgba(0,212,232,.08);color:rgba(216,207,196,.85)}
-.chat-row-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-.sb-foot{padding:.55rem .65rem;border-top:1px solid var(--bd);flex-shrink:0}
-.user-row{display:flex;align-items:center;gap:7px;padding:.35rem .45rem;cursor:pointer;transition:background .15s}
-.user-row:hover{background:rgba(255,255,255,.04)}
-.avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#00bcd4,#26e5ff);display:flex;align-items:center;justify-content:center;font-size:.5rem;font-weight:700;color:#fff;flex-shrink:0}
-.user-name{font-size:.67rem;color:var(--t);font-weight:500}
-.user-plan{font-size:.57rem;color:var(--t3)}
-
-/* MAIN */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative}
-.topbar{height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;padding:0 1.1rem;border-bottom:1px solid var(--bd);background:rgba(10,9,9,.97);z-index:20;position:relative}
-.topbar-l{display:flex;align-items:center;gap:.6rem;position:absolute;left:1.1rem}
-.model-pill{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.03);border:1px solid var(--bd);padding:.24rem .55rem;font-size:.63rem;color:var(--t2);cursor:pointer}
-.model-dot{width:5px;height:5px;border-radius:50%;background:var(--acc2);animation:pulse 2s infinite;flex-shrink:0}
-.content{flex:1;overflow-y:auto;overflow-x:hidden;position:relative}
-.content::-webkit-scrollbar{width:3px}
-.content::-webkit-scrollbar-thumb{background:rgba(255,255,255,.05)}
-.dot-grid{position:absolute;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(circle,rgba(255,255,255,0.04) 1px,transparent 1px);background-size:28px 28px}
-
-/* HOME */
-.home{
-  width:100%;height:100%;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  position:relative;z-index:1;
-  gap:0;
+@keyframes beamHLeft {
+  0%   { left: 100%;  opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { left: -80px; opacity: 1; }
+  100% { left: -80px; opacity: 0; }
+}
+@keyframes beamHRight {
+  0%   { left: -80px; opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { left: 100%;  opacity: 1; }
+  100% { left: 100%;  opacity: 0; }
 }
 
-.hero-title-wrap{
-  text-align:center;
-  padding:0 1rem 1.5rem;
-  flex-shrink:0;
+/* ── SCROLLBARS ── */
+.px-sidebar-chats::-webkit-scrollbar { width: 2px; }
+.px-sidebar-chats::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+.px-chat-area::-webkit-scrollbar { width: 3px; }
+.px-chat-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.07); border-radius: 2px; }
+
+/* ── SIDEBAR ── */
+.px-sidebar {
+  width: 240px; flex-shrink: 0;
+  background: ${PANEL};
+  border-right: 1px solid ${BORDER_SOFT};
+  display: flex; flex-direction: column;
+  height: 100%; position: relative; z-index: 10; overflow: hidden;
 }
-.hero-title{
-  font-family:'Libre Baskerville',serif;
-  font-size:clamp(1.8rem,4vw,3.2rem);
-  font-weight:700;color:var(--t);
-  line-height:1.08;letter-spacing:-.025em;
+.px-sidebar::after {
+  content: '';
+  position: absolute; right: 0; top: 0; bottom: 0; width: 1px;
+  background: linear-gradient(180deg, rgba(200,80,26,0.3), rgba(200,80,26,0.06) 14%, transparent 40%);
+  pointer-events: none;
 }
-.hero-sub{
-  font-size:.78rem;color:var(--t2);
-  margin-top:.6rem;line-height:1.7;font-weight:300;
+.px-sidebar-logo {
+  padding: 1.1rem 1.25rem 0.9rem;
+  border-bottom: 1px solid ${BORDER_SOFT};
+  display: flex; align-items: center; gap: 9px; cursor: pointer; flex-shrink: 0;
+}
+.px-logo-mark {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Geist', sans-serif; font-size: 0.6rem; font-weight: 600;
+  color: ${TEXT_PRIMARY}; flex-shrink: 0;
+}
+.px-logo-text {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.05rem; color: ${TEXT_PRIMARY}; letter-spacing: -0.02em;
+}
+.px-new-chat-btn {
+  display: flex; align-items: center; gap: 9px; width: 100%;
+  padding: 0.55rem 0.8rem;
+  background: ${ACCENT_SOFT}; border: 1px solid ${ACCENT_BORDER};
+  border-radius: 6px; cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  color: rgba(200,80,26,0.9);
+  font-family: 'Geist', sans-serif; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.03em;
+}
+.px-new-chat-btn:hover { background: rgba(200,80,26,0.16); border-color: rgba(200,80,26,0.4); }
+.px-section-label {
+  font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: ${TEXT_MUTED}; padding: 0.75rem 1.1rem 0.35rem;
+  font-family: 'Geist', sans-serif;
+}
+.px-sidebar-chats { flex: 1; overflow-y: auto; padding-bottom: 0.5rem; }
+.px-chat-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0.45rem 1.1rem; cursor: pointer;
+  transition: background 0.12s; position: relative;
+}
+.px-chat-item:hover { background: rgba(255,255,255,0.035); }
+.px-chat-item.active { background: rgba(200,80,26,0.08); }
+.px-chat-item.active::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: ${ACCENT};
+}
+.px-chat-dot { width: 4px; height: 4px; border-radius: 50%; background: ${TEXT_MUTED}; flex-shrink: 0; margin-top: 1px; }
+.px-chat-item.active .px-chat-dot { background: ${ACCENT}; }
+.px-chat-title {
+  font-size: 0.74rem; color: ${TEXT_SECONDARY};
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-weight: 300; line-height: 1.35; flex: 1; min-width: 0;
+}
+.px-chat-item.active .px-chat-title { color: rgba(200,80,26,0.88); font-weight: 400; }
+.px-chat-time { font-size: 0.58rem; color: ${TEXT_MUTED}; flex-shrink: 0; }
+.px-sidebar-divider { border: none; border-top: 1px dashed rgba(255,255,255,0.06); margin: 0 0.85rem 0.25rem; }
+.px-sidebar-bottom {
+  border-top: 1px solid ${BORDER_SOFT}; padding: 0.75rem 0.85rem;
+  display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;
+}
+.px-sidebar-btn {
+  display: flex; align-items: center; gap: 9px;
+  padding: 0.45rem 0.6rem; border-radius: 5px; cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  color: ${TEXT_MUTED}; font-size: 0.72rem;
+  font-family: 'Geist', sans-serif; font-weight: 300;
+  background: none; border: none; width: 100%; text-align: left;
+}
+.px-sidebar-btn:hover { background: rgba(255,255,255,0.035); color: ${TEXT_SECONDARY}; }
+.px-sidebar-btn.danger { color: rgba(200,80,26,0.5); }
+.px-sidebar-btn.danger:hover { color: rgba(200,80,26,0.8); }
+
+/* ── MAIN ── */
+.px-main {
+  flex: 1; display: flex; flex-direction: column; min-width: 0;
+  position: relative; overflow: hidden;
 }
 
-/*
-  ═══════════════════════════════════════════════════
-  THE WRAPPER:
-  - .cta-outer is a full-width block
-  - Its top line IS the outer-rect top border
-  - The CTA button floats centered on that top line
-  - Below the line: the outer-rect body (cards + textarea)
-  ═══════════════════════════════════════════════════
-*/
-
-/* The full-width outer border box */
-.outer-rect{
-  width:100%;
-  flex-shrink:0;
-  position:relative;
-  border:1px solid rgba(255,255,255,0.12);
+/* ── TOPBAR ── */
+.px-topbar {
+  height: 54px; border-bottom: 1px solid ${BORDER_SOFT};
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1.5rem;
+  background: rgba(7,8,8,0.85); backdrop-filter: blur(12px);
+  flex-shrink: 0; position: relative; z-index: 20;
 }
-
-/* Beam canvases — sit exactly ON the border lines */
-.cv-vl{position:absolute;top:0;left:-1px;width:2px;height:100%;display:block;pointer-events:none;z-index:10}
-.cv-vr{position:absolute;top:0;right:-1px;width:2px;height:100%;display:block;pointer-events:none;z-index:10}
-.cv-hl{position:absolute;top:-1px;left:0;height:2px;display:block;pointer-events:none;z-index:10}
-.cv-hr{position:absolute;top:-1px;left:0;height:2px;display:block;pointer-events:none;z-index:10}
-
-/*
-  CTA button floats centered on the TOP border of outer-rect.
-  It sits in an absolutely-positioned row at top:-1px,
-  so the border line runs through the vertical center of the button.
-  background:var(--bg) hides the border behind the button.
-*/
-.cta-float{
-  position:absolute;
-  top:-1px;left:0;right:0;
-  height:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  pointer-events:none;
-  z-index:12;
+.px-topbar-title {
+  font-family: 'Libre Baskerville', serif; font-size: 0.88rem;
+  color: ${TEXT_SECONDARY}; font-style: italic; letter-spacing: -0.01em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 400px;
 }
-.cta-btn{
-  transform:translateY(-50%);
-  font-family:'Geist',sans-serif;
-  font-size:.74rem;font-weight:500;
-  letter-spacing:.1em;text-transform:uppercase;
-  color:var(--t);
-  background:var(--bg);
-  border:1px solid rgba(255,255,255,.22);
-  padding:.78rem 2rem;
-  cursor:pointer;
-  transition:border-color .2s,color .2s;
-  white-space:nowrap;
-  pointer-events:all;
-  flex-shrink:0;
+.px-topbar-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+.px-mode-toggle { display: flex; border: 1px solid ${BORDER}; border-radius: 5px; overflow: hidden; }
+.px-mode-btn {
+  padding: 0.28rem 0.7rem; font-size: 0.65rem;
+  font-family: 'Geist', sans-serif; font-weight: 400; letter-spacing: 0.04em;
+  background: none; border: none; cursor: pointer; color: ${TEXT_MUTED};
+  transition: background 0.15s, color 0.15s;
 }
-.cta-btn:hover{border-color:rgba(0,212,232,.5);color:var(--acc2)}
+.px-mode-btn.active { background: rgba(255,255,255,0.06); color: ${TEXT_PRIMARY}; }
+.px-live-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: ${ACCENT_SOFT}; border: 1px solid ${ACCENT_BORDER};
+  border-radius: 999px; padding: 0.25rem 0.75rem;
+  font-size: 0.62rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+  color: rgba(200,80,26,0.85);
+}
+.px-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: ${ACCENT}; animation: bpulse 2s infinite; flex-shrink: 0; }
+.px-topbar-icon-btn {
+  width: 32px; height: 32px; border: 1px solid ${BORDER}; background: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border-radius: 5px; color: ${TEXT_MUTED};
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.px-topbar-icon-btn:hover { background: rgba(255,255,255,0.035); color: ${TEXT_SECONDARY}; }
 
-/*
-  INNER LAYOUT inside outer-rect:
-  3-column grid: [card col 160px] [center] [card col 160px]
-  Each card col has 2 cards: one at top, one at bottom.
-  Center col has the textarea box.
-*/
-.rect-inner{
-  display:grid;
-  grid-template-columns:160px 1fr 160px;
-  grid-template-rows:1fr;
-  width:100%;
-  padding:1.8rem 0 1.6rem;
-  min-height:280px;
+/* ── HERO / WELCOME SCREEN (original Kreona layout) ── */
+.px-hero-screen {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background:
+    linear-gradient(${GRID} 1px, transparent 1px),
+    linear-gradient(90deg, ${GRID} 1px, transparent 1px),
+    radial-gradient(circle at 50% 9%, rgba(255,255,255,0.035), transparent 25%),
+    ${BG};
+  background-size: 24px 24px, 24px 24px, auto, auto;
 }
 
-/* Left and right card columns */
-.card-col{
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  align-items:center;
-  padding:0 1.2rem;
+/* vertical rail lines */
+.px-hero-screen::before, .px-hero-screen::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 1px;
+  background: linear-gradient(180deg, rgba(0,216,237,0.4), rgba(0,216,237,0.05) 14%, transparent 45%);
+  pointer-events: none; z-index: 1;
+}
+.px-hero-screen::before { left: 58px; }
+.px-hero-screen::after  { right: 58px; }
+
+/* beam animations */
+.px-beam-v {
+  position: absolute; width: 1px; height: 110px; pointer-events: none; z-index: 10;
+  top: -110px; animation: beamVertical 3.5s cubic-bezier(0.4,0,0.6,1) infinite;
+  background: linear-gradient(180deg, transparent 0%, ${CYAN} 50%, transparent 100%);
+}
+.px-beam-vl { left: 58px; }
+.px-beam-vr { right: 58px; }
+.px-beam-h {
+  position: absolute; height: 2px; width: 80px; pointer-events: none; z-index: 10; top: -1px;
+}
+.px-beam-hl {
+  animation: beamHLeft 3.5s cubic-bezier(0.4,0,0.6,1) infinite;
+  background: linear-gradient(90deg, transparent 0%, ${CYAN} 50%, transparent 100%);
+}
+.px-beam-hr {
+  animation: beamHRight 3.5s cubic-bezier(0.4,0,0.6,1) infinite;
+  background: linear-gradient(90deg, transparent 0%, ${CYAN} 50%, transparent 100%);
 }
 
-.card-item{
-  display:flex;flex-direction:column;align-items:center;gap:.45rem;
+/* hero text */
+.px-hero-section {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center;
+  padding-top: 42px; text-align: center;
+  animation: fadeIn 0.8s ease both;
+}
+.px-hero-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: clamp(3.2rem, 6.5vw, 5.4rem);
+  font-weight: 400; line-height: 0.99; letter-spacing: -0.03em;
+  color: transparent;
+  background: linear-gradient(90deg, #eeeeef 0%, #b8b8bb 47%, #5d5d61 82%, rgba(75,75,79,0.45) 100%);
+  -webkit-background-clip: text; background-clip: text;
+}
+.px-hero-sub {
+  margin-top: 22px; max-width: 640px;
+  color: rgba(232,220,200,0.55); font-size: 1rem;
+  font-family: 'Geist', sans-serif; font-weight: 300; line-height: 1.5;
+  padding: 0 18px;
+  animation: fadeIn 0.8s ease 0.2s both;
 }
 
-.card-box{
-  width:66px;height:66px;
-  background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.09);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:background .2s,border-color .2s;
+/* stage area */
+.px-stage {
+  position: relative; z-index: 2;
+  width: min(100%, 1200px);
+  height: 460px;
+  margin: 50px auto 0;
+  animation: fadeIn 0.8s ease 0.4s both;
 }
-.card-box:hover{background:rgba(0,212,232,.06);border-color:rgba(0,212,232,.22)}
-.card-box svg{width:27px;height:27px;fill:none;stroke:#5e5852;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
-.card-lbl{font-size:.56rem;color:var(--t3);letter-spacing:.07em;text-align:center;text-transform:uppercase}
+/* cyan rule */
+.px-cyan-rule {
+  position: absolute; left: 0; right: 0; top: 29px; height: 1px;
+  background: linear-gradient(90deg, rgba(0,216,237,0.48), transparent 16%, transparent 84%, rgba(0,216,237,0.48));
+  overflow: visible;
+}
+/* CTA row */
+.px-cta-row {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; align-items: center;
+}
+.px-cta-line-l {
+  height: 1px; flex: 1;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.11));
+  position: relative; overflow: hidden;
+}
+.px-cta-line-r {
+  height: 1px; flex: 1;
+  background: linear-gradient(90deg, rgba(255,255,255,0.11), transparent);
+  position: relative; overflow: hidden;
+}
+.px-cta-btn {
+  width: 220px; height: 55px;
+  border: 2px solid rgba(255,255,255,0.94); background: #090a0a;
+  color: #fff; cursor: pointer; font-size: 14px; font-weight: 700;
+  letter-spacing: 0.04em;
+  font-family: 'Geist', sans-serif;
+  transition: border-color 160ms, color 160ms;
+  white-space: nowrap;
+}
+.px-cta-btn:hover { border-color: ${CYAN}; color: ${CYAN}; }
 
-/* Center col: textarea */
-.center-col{
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
+/* command frame lines */
+.px-frame-line-h {
+  position: absolute; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1) 10%, rgba(255,255,255,0.1) 90%, transparent);
 }
 
-.chat-box{
-  border:1px solid rgba(255,255,255,0.09);
-  background:#0f0e0e;
-  display:flex;flex-direction:column;
+/* feature icons in corners */
+.px-feat {
+  position: absolute; z-index: 2; width: 90px; text-align: center;
+  color: rgba(146,147,154,0.6);
+  font-family: ui-monospace, Menlo, monospace; font-size: 11px;
 }
-.big-ta{
-  flex:1;background:transparent;border:none;outline:none;resize:none;
-  font-family:'Geist',monospace;font-size:.82rem;font-weight:300;
-  color:rgba(216,207,196,.3);
-  padding:1.2rem 1.3rem;line-height:1.65;
-  min-height:150px;
+.px-feat-icon {
+  width: 64px; height: 64px;
+  display: grid; place-items: center;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.035);
+  margin: 0 auto 11px;
 }
-.big-ta::placeholder{color:rgba(216,207,196,.14)}
-.toolbar{
-  border-top:1px solid rgba(255,255,255,.055);
-  display:flex;align-items:center;padding:.5rem .85rem;gap:.5rem;
-  background:#0f0e0e;
-}
-.tb-btn{width:30px;height:30px;background:rgba(0,212,232,.07);border:1px solid rgba(0,212,232,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s;flex-shrink:0}
-.tb-btn:hover{background:rgba(0,212,232,.16);border-color:rgba(0,212,232,.44)}
-.sc-btn{display:flex;align-items:center;gap:5px;background:rgba(0,212,232,.06);border:1px solid rgba(0,212,232,.2);padding:.3rem .75rem;font-size:.67rem;font-weight:500;color:var(--acc2);cursor:pointer;transition:all .18s;font-family:'Geist',sans-serif}
-.sc-btn:hover{background:rgba(0,212,232,.13);border-color:rgba(0,212,232,.44)}
-.send-btn{margin-left:auto;width:30px;height:30px;background:rgba(0,212,232,.1);border:1px solid rgba(0,212,232,.26);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s;flex-shrink:0}
-.send-btn:hover{background:rgba(0,212,232,.22);border-color:rgba(0,212,232,.52)}
 
-/* CHAT */
-.msgs{padding:1.5rem 2rem;display:flex;flex-direction:column;gap:1.4rem;max-width:760px;margin:0 auto;width:100%}
-.msg{animation:msgIn .26s ease both}
-.msg-user{display:flex;justify-content:flex-end}
-.msg-user-bubble{background:rgba(0,212,232,.07);border:1px solid rgba(0,212,232,.13);padding:.6rem .9rem;font-size:.8rem;color:var(--t);max-width:68%;font-weight:300;line-height:1.65}
-.msg-ai{display:flex;gap:.7rem;align-items:flex-start}
-.ai-av{width:20px;height:20px;flex-shrink:0;margin-top:2px;background:rgba(0,212,232,.1);border:1px solid rgba(0,212,232,.22);display:flex;align-items:center;justify-content:center;font-size:.48rem;font-weight:700;color:var(--acc2);font-family:'Libre Baskerville',serif;border-radius:50%}
-.ai-body{flex:1;min-width:0}
-.ai-who{font-size:.55rem;color:var(--t3);margin-bottom:.3rem;letter-spacing:.06em;text-transform:uppercase}
-.ai-txt{font-size:.8rem;color:var(--t2);font-weight:300;line-height:1.75;white-space:pre-line}
-.sources{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.55rem}
-.src{font-size:.57rem;background:rgba(255,255,255,.03);border:1px solid var(--bd);padding:.12rem .4rem;color:var(--t3);cursor:pointer;transition:all .15s}
-.src:hover{border-color:rgba(0,212,232,.3);color:var(--acc2)}
-.typing-dots{display:flex;gap:4px;align-items:center;padding:.3rem 0}
-.td{width:4px;height:4px;border-radius:50%;background:var(--t3);animation:tdot 1.2s ease infinite}
-.td:nth-child(2){animation-delay:.18s}
-.td:nth-child(3){animation-delay:.36s}
-.btm{border-top:1px solid var(--bd);background:rgba(10,9,9,.96);padding:.65rem 1.8rem;flex-shrink:0}
-.btm-inner{max-width:760px;margin:0 auto;display:flex;align-items:flex-end;gap:.55rem}
-.btm-ta{flex:1;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:.5rem .8rem;font-family:'Geist',sans-serif;font-size:.78rem;color:var(--t);resize:none;outline:none;min-height:36px;max-height:120px;transition:border-color .15s}
-.btm-ta::placeholder{color:var(--t3)}
-.btm-ta:focus{border-color:rgba(0,212,232,.25)}
+/* composer */
+.px-composer-stage {
+  position: absolute; z-index: 3;
+  left: 170px; right: 170px; top: 128px;
+  height: 210px;
+  border: 1px solid rgba(255,255,255,0.17);
+  background: #101113; padding: 8px;
+}
+.px-stage-textarea {
+  display: block; width: 100%; height: 140px; resize: none; outline: none;
+  border: 1px solid rgba(255,255,255,0.11);
+  background: #18191c; color: #c6c9d6;
+  padding: 20px 22px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px; line-height: 1.5;
+}
+.px-stage-textarea::placeholder { color: #535966; }
+.px-stage-footer {
+  height: 55px; display: flex; align-items: center; gap: 10px;
+}
+.px-stage-icon-btn {
+  width: 38px; height: 38px; display: grid; place-items: center;
+  border: 1px solid rgba(255,255,255,0.13); background: #18191c; color: ${CYAN};
+  cursor: pointer; transition: border-color 150ms, background 150ms;
+}
+.px-stage-icon-btn:hover { border-color: rgba(0,216,237,0.55); background: rgba(0,216,237,0.08); }
+.px-stage-search-btn {
+  height: 38px; min-width: 160px; display: flex; align-items: center; gap: 9px; padding: 0 14px;
+  border: 1px solid rgba(255,255,255,0.13); background: #18191c; color: ${CYAN};
+  font-family: ui-monospace, Menlo, monospace; font-size: 12px;
+  cursor: pointer; transition: border-color 150ms, background 150ms;
+}
+.px-stage-search-btn:hover { border-color: rgba(0,216,237,0.55); background: rgba(0,216,237,0.08); }
+.px-stage-send-btn {
+  width: 38px; height: 38px; display: grid; place-items: center; margin-left: auto;
+  border: 1px solid rgba(255,255,255,0.13); background: #18191c;
+  cursor: pointer; transition: border-color 150ms, background 150ms;
+}
+.px-stage-send-btn:hover { border-color: rgba(0,216,237,0.55); background: rgba(0,216,237,0.08); }
+
+/* ── CHAT VIEW ── */
+.px-chat-view {
+  flex: 1; display: flex; flex-direction: column;
+  background:
+    linear-gradient(${GRID} 1px, transparent 1px),
+    linear-gradient(90deg, ${GRID} 1px, transparent 1px),
+    ${BG};
+  background-size: 24px 24px, 24px 24px;
+  overflow: hidden;
+}
+.px-chat-area {
+  flex: 1; overflow-y: auto;
+  padding: 2rem 0;
+  display: flex; flex-direction: column; align-items: center;
+}
+.px-messages-wrap {
+  width: 100%; max-width: 680px; padding: 0 1.5rem;
+  display: flex; flex-direction: column; gap: 1.75rem;
+}
+.px-msg { display: flex; flex-direction: column; gap: 4px; animation: fadeUp 0.35s ease both; }
+.px-msg-role {
+  font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: ${TEXT_MUTED}; font-family: 'Geist', sans-serif;
+  padding: 0 2px; display: flex; align-items: center; gap: 6px;
+}
+.px-msg-role-dot { width: 4px; height: 4px; border-radius: 50%; background: ${ACCENT}; }
+.px-msg-role-dot.user { background: rgba(0,216,237,0.6); }
+.px-msg-bubble {
+  font-size: 0.85rem; line-height: 1.8;
+  font-weight: 300; color: ${TEXT_SECONDARY}; padding: 0 2px;
+}
+.px-msg.user .px-msg-bubble {
+  background: rgba(255,255,255,0.03); border: 1px solid ${BORDER_SOFT};
+  border-radius: 6px; padding: 0.75rem 1rem; color: rgba(232,220,200,0.72);
+}
+.px-msg-sources { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 0.75rem; }
+.px-source-chip {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 0.6rem; font-family: 'Geist', sans-serif;
+  background: rgba(255,255,255,0.03); border: 1px solid ${BORDER_SOFT};
+  padding: 0.2rem 0.55rem; border-radius: 4px; color: ${TEXT_MUTED};
+}
+.px-source-fav {
+  width: 13px; height: 13px; border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.5rem; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.px-typing-dots { display: flex; gap: 4px; align-items: center; padding: 4px 2px; }
+.px-typing-dot { width: 5px; height: 5px; border-radius: 50%; background: ${ACCENT}; animation: tdot 1.2s ease infinite; }
+.px-typing-dot:nth-child(2){animation-delay:.2s} .px-typing-dot:nth-child(3){animation-delay:.4s}
+
+/* ── CHAT COMPOSER (bottom bar in chat view) ── */
+.px-chat-composer {
+  border-top: 1px solid ${BORDER_SOFT};
+  background: rgba(7,8,8,0.7); backdrop-filter: blur(12px);
+  padding: 0.85rem 1.5rem 1rem; flex-shrink: 0; position: relative; z-index: 5;
+}
+.px-chat-composer-inner { max-width: 680px; margin: 0 auto; }
+.px-chat-composer-box {
+  border: 1px solid rgba(255,255,255,0.11); background: #18191c;
+  border-radius: 6px; overflow: hidden; transition: border-color 0.2s;
+}
+.px-chat-composer-box:focus-within { border-color: rgba(255,255,255,0.2); }
+.px-chat-textarea {
+  display: block; width: 100%; resize: none; outline: none; border: none;
+  background: transparent; color: #c6c9d6;
+  padding: 0.85rem 1rem 0.6rem;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.8rem; line-height: 1.6;
+  min-height: 72px; max-height: 180px;
+}
+.px-chat-textarea::placeholder { color: #42474f; }
+.px-chat-composer-footer {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0.45rem 0.75rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.px-cc-icon-btn {
+  width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255,255,255,0.1); background: none; border-radius: 4px;
+  cursor: pointer; color: ${TEXT_MUTED};
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.px-cc-icon-btn:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.16); color: ${TEXT_SECONDARY}; }
+.px-cc-search-btn {
+  display: flex; align-items: center; gap: 7px; height: 30px; padding: 0 10px;
+  border: 1px solid rgba(255,255,255,0.1); background: none; border-radius: 4px;
+  cursor: pointer; color: ${TEXT_MUTED};
+  font-family: ui-monospace, monospace; font-size: 0.68rem;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.px-cc-search-btn:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.16); color: ${TEXT_SECONDARY}; }
+.px-cc-send {
+  width: 30px; height: 30px; border: 1px solid rgba(255,255,255,0.13);
+  background: #18191c; display: flex; align-items: center; justify-content: center;
+  border-radius: 4px; cursor: pointer; margin-left: auto;
+  transition: border-color 0.15s, background 0.15s;
+}
+.px-cc-send:hover { border-color: rgba(0,216,237,0.4); background: rgba(0,216,237,0.06); }
+.px-composer-hint {
+  text-align: center; font-size: 0.62rem; color: ${TEXT_MUTED};
+  margin-top: 0.5rem; font-family: 'Geist', sans-serif; font-weight: 300; letter-spacing: 0.02em;
+}
+
+/* toast */
+.px-toast {
+  position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+  border: 1px solid rgba(0,216,237,0.24); background: rgba(8,10,11,0.92);
+  color: #cdd2d9; padding: 11px 16px; max-width: 600px;
+  font-size: 12px; font-family: ui-monospace, Menlo, monospace;
+  white-space: nowrap; transition: opacity 180ms ease; pointer-events: none; z-index: 100;
+}
 `;
 
-/* BEAM DRAW */
-function drawVBeam(canvas, dpr, pos, goingDown) {
-  const ctx = canvas.getContext("2d");
-  const H = canvas.height / dpr;
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  ctx.clearRect(0,0,2,H);
-  const x=1, y=goingDown?pos*H:(1-pos)*H;
-  const TRAIL=Math.min(H*.3,100), TIP=16, d=goingDown?-1:1;
-  ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);
-  ctx.strokeStyle="rgba(255,255,255,0.08)";ctx.lineWidth=1;ctx.stroke();
-  const tg=ctx.createLinearGradient(x,y+d*TRAIL,x,y);
-  tg.addColorStop(0,"rgba(0,190,210,0)");tg.addColorStop(.6,"rgba(0,212,232,.25)");tg.addColorStop(1,"rgba(0,212,232,.75)");
-  ctx.beginPath();ctx.moveTo(x,y+d*TRAIL);ctx.lineTo(x,y);ctx.strokeStyle=tg;ctx.lineWidth=1.5;ctx.stroke();
-  const eg=ctx.createLinearGradient(x,y+d*TIP,x,y);
-  eg.addColorStop(0,"rgba(0,212,232,.1)");eg.addColorStop(1,"rgba(38,238,255,1)");
-  ctx.beginPath();ctx.moveTo(x,y+d*TIP);ctx.lineTo(x,y);ctx.strokeStyle=eg;ctx.lineWidth=2;ctx.stroke();
-  const grd=ctx.createRadialGradient(x,y,0,x,y,10);
-  grd.addColorStop(0,"rgba(38,238,255,.9)");grd.addColorStop(.4,"rgba(0,212,232,.3)");grd.addColorStop(1,"rgba(0,190,210,0)");
-  ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();
-}
-
-function drawHBeam(canvas, dpr, pos, goingRight) {
-  const ctx = canvas.getContext("2d");
-  const W = canvas.width / dpr;
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  ctx.clearRect(0,0,W,2);
-  const y=1, x=goingRight?pos*W:(1-pos)*W;
-  const TRAIL=Math.min(W*.3,110), TIP=16, d=goingRight?-1:1;
-  ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);
-  ctx.strokeStyle="rgba(255,255,255,0.08)";ctx.lineWidth=1;ctx.stroke();
-  const tg=ctx.createLinearGradient(x+d*TRAIL,y,x,y);
-  tg.addColorStop(0,"rgba(0,190,210,0)");tg.addColorStop(.6,"rgba(0,212,232,.25)");tg.addColorStop(1,"rgba(0,212,232,.75)");
-  ctx.beginPath();ctx.moveTo(x+d*TRAIL,y);ctx.lineTo(x,y);ctx.strokeStyle=tg;ctx.lineWidth=1.5;ctx.stroke();
-  const eg=ctx.createLinearGradient(x+d*TIP,y,x,y);
-  eg.addColorStop(0,"rgba(0,212,232,.1)");eg.addColorStop(1,"rgba(38,238,255,1)");
-  ctx.beginPath();ctx.moveTo(x+d*TIP,y);ctx.lineTo(x,y);ctx.strokeStyle=eg;ctx.lineWidth=2;ctx.stroke();
-  const grd=ctx.createRadialGradient(x,y,0,x,y,10);
-  grd.addColorStop(0,"rgba(38,238,255,.9)");grd.addColorStop(.4,"rgba(0,212,232,.3)");grd.addColorStop(1,"rgba(0,190,210,0)");
-  ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();
-}
-
-/* DATA */
-const HISTORY=[
-  {id:1,text:"What is RAG vs fine-tuning?",sec:"Today"},
-  {id:2,text:"Best vector DB for production scale",sec:"Today"},
-  {id:3,text:"How does HNSW indexing work?",sec:"Today"},
-  {id:4,text:"Purplex API streaming setup",sec:"Yesterday"},
-  {id:5,text:"Compare Pinecone vs Weaviate 2026",sec:"Yesterday"},
-  {id:6,text:"LLM hallucination reduction patterns",sec:"Yesterday"},
-  {id:7,text:"Building cited Q&A bot in JS",sec:"Last 7 days"},
-  {id:8,text:"Sub-300ms latency architecture",sec:"Last 7 days"},
-];
-const DEMO=[
-  {role:"user",text:"What is the difference between RAG and fine-tuning?"},
-  {role:"ai",text:"RAG retrieves external documents at inference time and feeds them as context — no weights change. Fine-tuning permanently bakes knowledge into model weights.\n\nRAG wins on freshness, cost, and explainability. Fine-tuning wins on speed and task fluency — but knowledge goes stale and hallucinations are harder to trace.",sources:["arxiv.org","huggingface.co","github.com"]},
-];
-const AI_REPLIES=[
-  "Based on the most current data across arxiv, Wired, and GitHub: the RAG landscape has shifted significantly in 2026. New retrieval architectures are hitting sub-180ms median latency while maintaining citation accuracy above 96% on factual benchmarks.",
-  "Great question. The key insight is that both approaches complement each other — many production systems now use fine-tuned base models with RAG overlays to get both task fluency and fresh, citable context.",
-  "Purplex Deep v1.0 uses a hybrid approach: lightweight fine-tuned retrieval heads combined with real-time web context. This gives you the best of both worlds with minimal latency overhead.",
-];
-const IS={fill:"none",stroke:"#5e5852",strokeWidth:1.4,strokeLinecap:"round",strokeLinejoin:"round"};
-
-function GearSVG({color="var(--acc2)",size=14}){return<svg viewBox="0 0 24 24"width={size}height={size}fill="none"stroke={color}strokeWidth="1.8"strokeLinecap="round"strokeLinejoin="round"><circle cx="12"cy="12"r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;}
-function GridSVG({color="var(--acc2)",size=13}){return<svg viewBox="0 0 16 16"width={size}height={size}fill="none"stroke={color}strokeWidth="1.4"strokeLinecap="round"strokeLinejoin="round"><rect x="1"y="1"width="6"height="6"rx=".5"/><rect x="9"y="1"width="6"height="6"rx=".5"/><rect x="1"y="9"width="6"height="6"rx=".5"/><rect x="9"y="9"width="6"height="6"rx=".5"/></svg>;}
-function ArrowSVG({color="var(--acc2)",size=12}){return<svg viewBox="0 0 24 24"width={size}height={size}fill="none"stroke={color}strokeWidth="2.2"strokeLinecap="round"strokeLinejoin="round"><line x1="5"y1="12"x2="19"y2="12"/><polyline points="12 5 19 12 12 19"/></svg>;}
-
-export default function Dashboard() {
-  const [sbOpen,setSbOpen]=useState(true);
-  const [activeId,setActiveId]=useState(null);
-  const [mode,setMode]=useState("home");
-  const [messages,setMessages]=useState([]);
-  const [inputVal,setInputVal]=useState("");
-  const [typing,setTyping]=useState(false);
-  const aiIdxRef=useRef(0);
-  const contentRef=useRef(null);
-  const outerRef=useRef(null);
-  const cvVL=useRef(null);
-  const cvVR=useRef(null);
-  const cvHL=useRef(null);
-  const cvHR=useRef(null);
-  const phaseRef=useRef(0);
-  const rafRef=useRef(null);
-  const dpr=typeof window!=="undefined"?(window.devicePixelRatio||1):1;
-
-  useEffect(()=>{
-    const id="px-v5";
-    if(!document.getElementById(id)){const s=document.createElement("style");s.id=id;s.textContent=CSS;document.head.appendChild(s);}
-    return()=>document.getElementById(id)?.remove();
-  },[]);
-
-  useEffect(()=>{
-    if(mode!=="home")return;
-    const SPEED=0.0012;
-
-    function size(){
-      const el=outerRef.current;if(!el)return;
-      const W=el.offsetWidth,H=el.offsetHeight;
-      [cvVL.current,cvVR.current].forEach(cv=>{
-        if(!cv)return;
-        cv.width=Math.ceil(2*dpr);cv.height=Math.ceil(H*dpr);
-        cv.style.height=H+"px";
-      });
-      [cvHL.current,cvHR.current].forEach(cv=>{
-        if(!cv)return;
-        cv.width=Math.ceil(W*dpr);cv.height=Math.ceil(2*dpr);
-        cv.style.width=W+"px";
-      });
+// ── typewriter hook (for hero placeholder) ───────────────────
+function useTypewriter(phrases, speed = 40, pause = 2400) {
+  const [displayed, setDisplayed] = useState("");
+  const [pi, setPi] = useState(0);
+  const [ci, setCi] = useState(0);
+  const [del, setDel] = useState(false);
+  useEffect(() => {
+    const cur = phrases[pi];
+    let t;
+    if (!del && ci <= cur.length) {
+      t = setTimeout(() => { setDisplayed(cur.slice(0, ci)); setCi(c => c + 1); }, speed);
+    } else if (!del && ci > cur.length) {
+      t = setTimeout(() => setDel(true), pause);
+    } else if (del && ci >= 0) {
+      t = setTimeout(() => { setDisplayed(cur.slice(0, ci)); setCi(c => c - 1); }, speed / 2);
+    } else {
+      setDel(false); setPi(i => (i + 1) % phrases.length);
     }
+    return () => clearTimeout(t);
+  }, [ci, del, pi, phrases, speed, pause]);
+  return displayed;
+}
 
-    const t=setTimeout(()=>{
-      size();
-      const ro=new ResizeObserver(size);
-      if(outerRef.current)ro.observe(outerRef.current);
-      function loop(){
-        phaseRef.current=(phaseRef.current+SPEED)%1;
-        const p=phaseRef.current;
-        if(cvVL.current)drawVBeam(cvVL.current,dpr,p,true);
-        if(cvVR.current)drawVBeam(cvVR.current,dpr,(p+.5)%1,false);
-        if(cvHL.current)drawHBeam(cvHL.current,dpr,p,true);
-        if(cvHR.current)drawHBeam(cvHR.current,dpr,(p+.5)%1,false);
-        rafRef.current=requestAnimationFrame(loop);
-      }
-      loop();
-      return()=>{cancelAnimationFrame(rafRef.current);ro.disconnect();};
-    },60);
-    return()=>{clearTimeout(t);cancelAnimationFrame(rafRef.current);};
-  },[mode,dpr]);
+const PLACEHOLDERS = [
+  "ASK: Generate a complex component architecture...",
+  "ASK: Build a real-time dashboard with WebSockets...",
+  "ASK: Create a design system with dark mode support...",
+  "ASK: Scaffold a Next.js app with auth and DB...",
+];
 
-  useEffect(()=>{
-    if(contentRef.current)contentRef.current.scrollTop=contentRef.current.scrollHeight;
-  },[messages,typing]);
+const INITIAL_CHATS = [
+  { group: "Today", items: [
+    { id: 1, title: "Best AI search engines 2026", time: "2m" },
+    { id: 2, title: "RAG vs fine-tuning differences", time: "1h" },
+    { id: 3, title: "Vector similarity search HNSW", time: "3h" },
+  ]},
+  { group: "Yesterday", items: [
+    { id: 4, title: "Next.js 15 streaming patterns", time: "1d" },
+    { id: 5, title: "PostgreSQL full-text search", time: "1d" },
+    { id: 6, title: "Supabase edge functions", time: "1d" },
+  ]},
+  { group: "This week", items: [
+    { id: 7, title: "Semantic caching strategies", time: "3d" },
+    { id: 8, title: "Multi-agent orchestration", time: "4d" },
+    { id: 9, title: "LLM evaluation frameworks", time: "5d" },
+    { id: 10, title: "Pinecone vs Weaviate vs Chroma", time: "6d" },
+  ]},
+];
 
-  const goHome=useCallback(()=>{setActiveId(null);setMessages([]);setMode("home");setInputVal("");},[]);
-  const loadChat=useCallback((id)=>{setActiveId(id);setMessages(DEMO);setMode("chat");},[]);
-  const send=useCallback((txt)=>{
-    if(!txt.trim())return;
-    setMessages(prev=>[...prev,{role:"user",text:txt.trim()}]);
-    setMode("chat");setInputVal("");setTyping(true);
-    setTimeout(()=>{
-      setTyping(false);
-      const reply=AI_REPLIES[aiIdxRef.current%AI_REPLIES.length];
-      aiIdxRef.current++;
-      setMessages(prev=>[...prev,{role:"ai",text:reply,sources:["wired.com","arxiv.org","github.com"]}]);
-    },2100);
-  },[]);
+const SEED_MESSAGES = [
+  { role: "user", text: "best AI search engine in 2026", sources: [] },
+  {
+    role: "assistant",
+    text: "Purplex leads 2026 benchmarks with sub-300ms first-token latency. It reads live sources — not a frozen training snapshot — and returns a single cited answer instead of ten blue links.",
+    sources: [
+      { label: "W", bg: "#e34c26", domain: "wired.com" },
+      { label: "A", bg: "#1a1a2e", domain: "arxiv.org" },
+      { label: "L", bg: "#0077b5", domain: "linkedin.com" },
+    ],
+  },
+];
 
-  const secs=["Today","Yesterday","Last 7 days"];
+const MODES = ["Search", "Deep", "Reason"];
 
-  return(
-    <div className="root">
-      {/* SIDEBAR */}
-      <div className={`sb${sbOpen?"":" off"}`}>
-        <div className="sb-inner">
-          <div className="sb-head">
-            <div className="logo" onClick={goHome}><div className="logo-mark">P</div>purplex</div>
-            <button className="ico-btn" onClick={()=>setSbOpen(false)}>
-              <svg viewBox="0 0 24 24"width="11"height="11"fill="none"stroke="currentColor"strokeWidth="2"strokeLinecap="round"><line x1="18"y1="6"x2="6"y2="18"/><line x1="6"y1="6"x2="18"y2="18"/></svg>
-            </button>
-          </div>
-          <button className="new-chat" onClick={goHome}>+ New search</button>
-          <div className="sb-search">
-            <div className="sb-search-inner">
-              <svg viewBox="0 0 24 24"width="10"height="10"fill="none"stroke="currentColor"strokeWidth="2"strokeLinecap="round"style={{opacity:.3}}><circle cx="11"cy="11"r="8"/><line x1="21"y1="21"x2="16.65"y2="16.65"/></svg>
-              <span>Search chats</span>
-            </div>
-          </div>
-          <div className="chat-list">
-            {secs.map(sec=>{
-              const items=HISTORY.filter(c=>c.sec===sec);
-              if(!items.length)return null;
-              return(<div key={sec}><div className="sec-lbl">{sec}</div>{items.map(c=>(<div key={c.id}className={`chat-row${activeId===c.id?" on":""}`}onClick={()=>loadChat(c.id)}><span className="chat-row-txt">{c.text}</span></div>))}</div>);
-            })}
-          </div>
-          <div className="sb-foot">
-            <div className="user-row">
-              <div className="avatar">JK</div>
-              <div style={{flex:1,minWidth:0}}><div className="user-name">James Kim</div><div className="user-plan">Pro · 8,342 queries left</div></div>
-              <button className="ico-btn"><GearSVG color="var(--t3)"size={11}/></button>
-            </div>
-          </div>
-        </div>
+// ── ICONS ────────────────────────────────────────────────────
+const Ic = {
+  Plus: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 5v14M5 12h14"/></svg>,
+  User: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>,
+  Settings: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M19.07 4.93l-2.12 2.12M7.05 16.95l-2.12 2.12"/></svg>,
+  Logout: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>,
+  Share: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="18" cy="5" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="18" cy="19" r="2"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>,
+  More: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>,
+  Send: () => <svg viewBox="0 0 24 24" width="14" height="14" fill={CYAN} strokeWidth="0"><path d="M5 11h10.5l-3.8-3.8L13.4 5 21 12l-7.6 7-1.7-2.2 3.8-3.8H5z"/></svg>,
+  Nodes: () => <svg viewBox="0 0 24 24" width="12" height="12" fill={CYAN}><circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="5" r="2.2"/><circle cx="19" cy="12" r="2.2"/><circle cx="12" cy="19" r="2.2"/></svg>,
+  Clear: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v4m0 6v4M5 12h4m6 0h4"/><circle cx="12" cy="12" r="7" opacity=".2"/></svg>,
+  Attach: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>,
+  CodeGen: () => <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#6b6c72" strokeWidth="1.6"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>,
+  Design: () => <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#6b6c72" strokeWidth="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M19.07 4.93l-2.12 2.12M7.05 16.95l-2.12 2.12"/></svg>,
+  Deploy: () => <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#6b6c72" strokeWidth="1.6"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>,
+  Chat: () => <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#6b6c72" strokeWidth="1.6"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
+};
+
+// ── MESSAGE ──────────────────────────────────────────────────
+function Message({ role, text, sources, typing }) {
+  const isUser = role === "user";
+  return (
+    <div className={`px-msg${isUser ? " user" : ""}`}>
+      <div className="px-msg-role">
+        <span className={`px-msg-role-dot${isUser ? " user" : ""}`} />
+        {isUser ? "You" : "Purplex"}
       </div>
-
-      {/* MAIN */}
-      <div className="main">
-        <div className="topbar">
-          <div className="topbar-l">
-            {!sbOpen&&(<button className="ico-btn"onClick={()=>setSbOpen(true)}><svg viewBox="0 0 24 24"width="11"height="11"fill="none"stroke="currentColor"strokeWidth="2"strokeLinecap="round"><line x1="3"y1="6"x2="21"y2="6"/><line x1="3"y1="12"x2="21"y2="12"/><line x1="3"y1="18"x2="21"y2="18"/></svg></button>)}
-            {!sbOpen&&<div className="logo"onClick={goHome}style={{fontSize:".82rem"}}><div className="logo-mark">P</div>purplex</div>}
-            {mode==="chat"&&<span style={{fontSize:".73rem",color:"var(--t2)",fontWeight:300}}>{activeId?HISTORY.find(c=>c.id===activeId)?.text:"New search"}</span>}
-          </div>
-          <div className="model-pill"><span className="model-dot"/>Purplex Deep · v1.0<span style={{opacity:.3,fontSize:".53rem",marginLeft:2}}>▾</span></div>
-        </div>
-
-        <div className="content" ref={contentRef}>
-          <div className="dot-grid"/>
-
-          {mode==="home"?(
-            <div className="home">
-
-              {/* TITLE */}
-              <div className="hero-title-wrap">
-                <div className="hero-title">AI-Powered Code &<br/>Architecture Design</div>
-                <div className="hero-sub">Purplex is your source for high-quality, scalable web assembly.<br/>Generate components, create designs, and chat with AI in seconds.</div>
+      <div className="px-msg-bubble">
+        {typing
+          ? <div className="px-typing-dots"><div className="px-typing-dot"/><div className="px-typing-dot"/><div className="px-typing-dot"/></div>
+          : text}
+        {!typing && sources?.length > 0 && (
+          <div className="px-msg-sources">
+            {sources.map((s, i) => (
+              <div key={i} className="px-source-chip">
+                <div className="px-source-fav" style={{ background: s.bg }}>{s.label}</div>
+                {s.domain}
               </div>
-
-              {/*
-                OUTER RECT — the big full-width border rectangle.
-                - border on all 4 sides
-                - CTA button floats on the TOP border via .cta-float
-                - beam canvases on all 4 border edges
-                - inside: 3-col grid [left cards][textarea][right cards]
-                - cards top and bottom of each side col → 4 corners
-              */}
-              <div className="outer-rect" ref={outerRef}>
-
-                {/* CTA floating on the top border */}
-                <div className="cta-float">
-                  <button className="cta-btn" onClick={()=>send("Tell me about Purplex")}>START BUILDING FREE</button>
-                </div>
-
-                {/* Beam canvases */}
-                <canvas ref={cvVL} className="cv-vl" style={{width:"2px"}}/>
-                <canvas ref={cvVR} className="cv-vr" style={{width:"2px"}}/>
-                <canvas ref={cvHL} className="cv-hl" style={{height:"2px"}}/>
-                <canvas ref={cvHR} className="cv-hr" style={{height:"2px"}}/>
-
-                {/* 3-col inner grid */}
-                <div className="rect-inner">
-
-                  {/* LEFT card column */}
-                  <div className="card-col">
-                    <div className="card-item">
-                      <div className="card-box">
-                        <svg viewBox="0 0 24 24"{...IS}><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                      </div>
-                      <div className="card-lbl">Code Gen</div>
-                    </div>
-                    <div className="card-item">
-                      <div className="card-box">
-                        <svg viewBox="0 0 24 24"{...IS}><rect x="3"y="3"width="7"height="7"/><rect x="14"y="3"width="7"height="7"/><rect x="14"y="14"width="7"height="7"/><rect x="3"y="14"width="7"height="7"/></svg>
-                      </div>
-                      <div className="card-lbl">Components</div>
-                    </div>
-                  </div>
-
-                  {/* CENTER: textarea + toolbar */}
-                  <div className="center-col">
-                    <div className="chat-box">
-                      <textarea
-                        className="big-ta"
-                        placeholder="ASK: Generate a complex component architecture..."
-                        value={inputVal}
-                        onChange={e=>setInputVal(e.target.value)}
-                        onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send(inputVal);}}}
-                        rows={7}
-                      />
-                      <div className="toolbar">
-                        <button className="tb-btn"><GearSVG/></button>
-                        <button className="sc-btn"><GridSVG/>/Search-Command</button>
-                        <button className="send-btn"onClick={()=>send(inputVal)}><ArrowSVG/></button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* RIGHT card column */}
-                  <div className="card-col">
-                    <div className="card-item">
-                      <div className="card-box">
-                        <svg viewBox="0 0 24 24"{...IS}><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                      </div>
-                      <div className="card-lbl">Design Sys</div>
-                    </div>
-                    <div className="card-item">
-                      <div className="card-box">
-                        <svg viewBox="0 0 24 24"{...IS}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                      </div>
-                      <div className="card-lbl">AI Support</div>
-                    </div>
-                  </div>
-
-                </div>{/* rect-inner */}
-              </div>{/* outer-rect */}
-
-            </div>
-          ):(
-            <div className="msgs">
-              {messages.map((m,i)=>(
-                <div key={i}className="msg">
-                  {m.role==="user"?(
-                    <div className="msg-user"><div className="msg-user-bubble">{m.text}</div></div>
-                  ):(
-                    <div className="msg-ai">
-                      <div className="ai-av">P</div>
-                      <div className="ai-body">
-                        <div className="ai-who">Purplex</div>
-                        <div className="ai-txt">{m.text}</div>
-                        {m.sources&&<div className="sources">{m.sources.map((s,si)=><span key={si}className="src">{s}</span>)}</div>}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-              {typing&&(
-                <div className="msg msg-ai">
-                  <div className="ai-av">P</div>
-                  <div className="ai-body">
-                    <div className="ai-who">Purplex</div>
-                    <div className="typing-dots"><span className="td"/><span className="td"/><span className="td"/></div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {mode==="chat"&&(
-          <div className="btm">
-            <div className="btm-inner">
-              <textarea className="btm-ta"placeholder="Ask a follow-up..."rows={1}value={inputVal}
-                onChange={e=>setInputVal(e.target.value)}
-                onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send(inputVal);}}}
-              />
-              <button className="tb-btn"><GearSVG/></button>
-              <button className="sc-btn"style={{whiteSpace:"nowrap"}}><GridSVG/>/Search-Command</button>
-              <button className="send-btn"onClick={()=>send(inputVal)}><ArrowSVG/></button>
-            </div>
+            ))}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ── HERO SCREEN (original Kreona design, now with sidebar) ───
+function HeroScreen({ onSend }) {
+  const [value, setValue] = useState("");
+  const placeholder = useTypewriter(PLACEHOLDERS, 38, 2600);
+
+  function send() {
+    const text = value.trim() || PLACEHOLDERS[0].replace("ASK: ", "").replace("...", "");
+    onSend(text);
+  }
+  function handleKey(e) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
+  }
+
+  return (
+    <div className="px-hero-screen">
+      {/* beams */}
+      <div className="px-beam-v px-beam-vl" aria-hidden="true" />
+      <div className="px-beam-v px-beam-vr" aria-hidden="true" />
+
+      {/* hero text */}
+      <section className="px-hero-section" aria-label="Studio">
+        <h1 className="px-hero-title">
+          AI-Powered Code &amp;<br />Architecture Design
+        </h1>
+        <p className="px-hero-sub">
+          Kreona Studio is your source for high-quality, scalable web assembly.<br />
+          Generate components, create designs, and chat with AI in seconds.
+        </p>
+      </section>
+
+      {/* stage */}
+      <section
+        style={{ position: "relative", zIndex: 2, width: "min(100%, 1200px)", height: 440, margin: "48px auto 0" }}
+        aria-label="Command center"
+      >
+        {/* cyan rule */}
+        <div className="px-cyan-rule" aria-hidden="true" />
+
+        {/* CTA row */}
+        <div className="px-cta-row">
+          <div className="px-cta-line-l">
+            <div className="px-beam-h px-beam-hl" />
+          </div>
+          <button className="px-cta-btn" onClick={send}>START BUILDING FREE</button>
+          <div className="px-cta-line-r">
+            <div className="px-beam-h px-beam-hr" />
+          </div>
+        </div>
+
+        {/* frame horizontal lines */}
+        <div className="px-frame-line-h" style={{ position: "absolute", top: 85 + 48, left: 90, right: 90 }} />
+        <div className="px-frame-line-h" style={{ position: "absolute", bottom: 68, left: 90, right: 90 }} />
+
+        {/* Feature: Code Gen — top left */}
+        <div className="px-feat" style={{ left: 90 - 45, top: 85 - 36 }}>
+          <div className="px-feat-icon"><Ic.CodeGen /></div>
+          <span>Code Gen</span>
+        </div>
+        {/* Feature: Design Sys — top right */}
+        <div className="px-feat" style={{ right: 90 - 45, top: 85 - 36 }}>
+          <div className="px-feat-icon"><Ic.Design /></div>
+          <span>Design Sys</span>
+        </div>
+        {/* Feature: Deploy — bottom left */}
+        <div className="px-feat" style={{ left: 90 - 45, bottom: 30 }}>
+          <div className="px-feat-icon"><Ic.Deploy /></div>
+          <span>Deploy</span>
+        </div>
+        {/* Feature: AI Chat — bottom right */}
+        <div className="px-feat" style={{ right: 90 - 45, bottom: 30 }}>
+          <div className="px-feat-icon"><Ic.Chat /></div>
+          <span>AI Chat</span>
+        </div>
+
+        {/* Composer */}
+        <div className="px-composer-stage">
+          <textarea
+            className="px-stage-textarea"
+            spellCheck={false}
+            placeholder={placeholder}
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            onKeyDown={handleKey}
+          />
+          <div className="px-stage-footer">
+            <button className="px-stage-icon-btn" onClick={() => setValue("")} aria-label="Clear">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke={CYAN} strokeWidth="2"><path d="M12 5v4m0 6v4M5 12h4m6 0h4"/><circle cx="12" cy="12" r="7" opacity=".25"/></svg>
+            </button>
+            <button className="px-stage-search-btn">
+              <Ic.Nodes /><span>/Search-Command</span>
+            </button>
+            <button className="px-stage-send-btn" onClick={send} aria-label="Send">
+              <Ic.Send />
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// ── CHAT VIEW ────────────────────────────────────────────────
+function ChatView({ messages, isTyping, onSend }) {
+  const [value, setValue] = useState("");
+  const areaRef = useRef(null);
+  const taRef = useRef(null);
+
+  useEffect(() => {
+    if (areaRef.current) areaRef.current.scrollTop = areaRef.current.scrollHeight;
+  }, [messages, isTyping]);
+
+  function autoResize(el) {
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 180) + "px";
+  }
+  function handleKey(e) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
+  }
+  function send() {
+    const text = value.trim(); if (!text) return;
+    onSend(text); setValue(""); if (taRef.current) taRef.current.style.height = "auto";
+  }
+
+  return (
+    <div className="px-chat-view">
+      <div className="px-chat-area" ref={areaRef}>
+        <div className="px-messages-wrap">
+          {messages.map((m, i) => (
+            <Message key={i} role={m.role} text={m.text} sources={m.sources} />
+          ))}
+          {isTyping && <Message role="assistant" typing />}
+        </div>
+      </div>
+      <div className="px-chat-composer">
+        <div className="px-chat-composer-inner">
+          <div className="px-chat-composer-box">
+            <textarea
+              ref={taRef}
+              className="px-chat-textarea"
+              placeholder="ASK: Search the live web for anything…"
+              value={value}
+              onChange={e => { setValue(e.target.value); autoResize(e.target); }}
+              onKeyDown={handleKey}
+              spellCheck={false}
+            />
+            <div className="px-chat-composer-footer">
+              <button className="px-cc-icon-btn" onClick={() => setValue("")}><Ic.Clear /></button>
+              <button className="px-cc-search-btn"><Ic.Nodes />/Search-Command</button>
+              <button className="px-cc-icon-btn"><Ic.Attach /></button>
+              <button className="px-cc-send" onClick={send}><Ic.Send /></button>
+            </div>
+          </div>
+          <p className="px-composer-hint">purplex reads the live web — answers cite real sources &nbsp;·&nbsp; press ⏎ to send</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── ROOT ─────────────────────────────────────────────────────
+export default function PurplexDashboard() {
+  const [chatGroups, setChatGroups] = useState(INITIAL_CHATS);
+  const [activeChatId, setActiveChatId] = useState(null); // null = hero
+  const [activeTitle, setActiveTitle] = useState("New search");
+  const [messages, setMessages] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [mode, setMode] = useState("Search");
+  const [toast, setToast] = useState({ text: "", visible: false });
+  const toastTimer = useRef(null);
+  const nextId = useRef(100);
+
+  useEffect(() => {
+    const id = "purplex-dash-css";
+    if (!document.getElementById(id)) {
+      const s = document.createElement("style"); s.id = id; s.textContent = GLOBAL_CSS;
+      document.head.appendChild(s);
+    }
+    return () => { const el = document.getElementById(id); if (el) el.remove(); };
+  }, []);
+
+  function showToast(msg) {
+    clearTimeout(toastTimer.current);
+    setToast({ text: msg, visible: true });
+    toastTimer.current = setTimeout(() => setToast(t => ({ ...t, visible: false })), 3800);
+  }
+
+  function selectChat(id, title) {
+    setActiveChatId(id);
+    setActiveTitle(title);
+    setMessages(SEED_MESSAGES);
+    setIsTyping(false);
+  }
+
+  function newChat() {
+    setActiveChatId(null);
+    setActiveTitle("New search");
+    setMessages([]);
+    setIsTyping(false);
+  }
+
+  function handleSend(text) {
+    const shortTitle = text.length > 40 ? text.slice(0, 40) + "…" : text;
+
+    // If coming from hero, create new chat
+    if (activeChatId === null) {
+      const id = nextId.current++;
+      setChatGroups(prev => {
+        const updated = [...prev];
+        updated[0] = { ...updated[0], items: [{ id, title: shortTitle, time: "now" }, ...updated[0].items] };
+        return updated;
+      });
+      setActiveChatId(id);
+      setActiveTitle(shortTitle);
+      setMessages([{ role: "user", text, sources: [] }]);
+    } else {
+      setMessages(prev => [...prev, { role: "user", text, sources: [] }]);
+      setActiveTitle(shortTitle);
+    }
+
+    showToast("Searching live web…");
+    setIsTyping(true);
+
+    setTimeout(() => {
+      setIsTyping(false);
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        text: "Based on live web sources retrieved in real time, here's a synthesised answer cross-referenced for accuracy and completeness across multiple authoritative references.",
+        sources: [
+          { label: "W", bg: "#e34c26", domain: "wired.com" },
+          { label: "A", bg: "#1a1a2e", domain: "arxiv.org" },
+        ],
+      }]);
+    }, 2000);
+  }
+
+  const isHero = activeChatId === null;
+
+  return (
+    <div style={{ display: "flex", height: "100vh", width: "100vw", background: BG, color: TEXT_PRIMARY, fontFamily: "'Geist', sans-serif", overflow: "hidden" }}>
+      {/* ── SIDEBAR ── */}
+      <aside className="px-sidebar">
+        <div className="px-sidebar-logo" onClick={newChat}>
+          <div className="px-logo-mark">P</div>
+          <span className="px-logo-text">purplex</span>
+        </div>
+        <div style={{ margin: "0.9rem 0.85rem 0.5rem" }}>
+          <button className="px-new-chat-btn" onClick={newChat}><Ic.Plus /> New search</button>
+        </div>
+        <div className="px-sidebar-chats">
+          {chatGroups.map((group, gi) => (
+            <div key={gi}>
+              <div className="px-section-label" style={gi > 0 ? { marginTop: "0.5rem" } : {}}>{group.group}</div>
+              {group.items.map(item => (
+                <div
+                  key={item.id}
+                  className={`px-chat-item${activeChatId === item.id ? " active" : ""}`}
+                  onClick={() => selectChat(item.id, item.title)}
+                >
+                  <div className="px-chat-dot" />
+                  <span className="px-chat-title">{item.title}</span>
+                  <span className="px-chat-time">{item.time}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="px-sidebar-bottom">
+          <hr className="px-sidebar-divider" />
+          <button className="px-sidebar-btn"><Ic.User /> Account</button>
+          <button className="px-sidebar-btn"><Ic.Settings /> Settings</button>
+          <button className="px-sidebar-btn danger"><Ic.Logout /> Sign out</button>
+        </div>
+      </aside>
+
+      {/* ── MAIN ── */}
+      <main className="px-main">
+        {/* topbar always visible */}
+        <div className="px-topbar">
+          <div className="px-topbar-title">{activeTitle}</div>
+          <div className="px-topbar-actions">
+            <div className="px-mode-toggle">
+              {MODES.map(m => (
+                <button key={m} className={`px-mode-btn${mode === m ? " active" : ""}`} onClick={() => setMode(m)}>{m}</button>
+              ))}
+            </div>
+            <div className="px-live-badge"><span className="px-badge-dot" />Live</div>
+            <button className="px-topbar-icon-btn"><Ic.Share /></button>
+            <button className="px-topbar-icon-btn"><Ic.More /></button>
+          </div>
+        </div>
+
+        {/* hero or chat */}
+        {isHero
+          ? <HeroScreen onSend={handleSend} />
+          : <ChatView messages={messages} isTyping={isTyping} onSend={handleSend} />
+        }
+      </main>
+
+      {/* toast */}
+      <div className="px-toast" role="status" aria-live="polite" style={{ opacity: toast.visible ? 1 : 0 }}>
+        {toast.text}
       </div>
     </div>
   );
