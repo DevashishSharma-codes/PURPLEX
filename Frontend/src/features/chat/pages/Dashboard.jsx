@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-
+import { useSelector } from "react-redux";
+import {useChat} from "../hooks/useChat.js";
 const GLOBAL_CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Geist:wght@300;400;500;600&display=swap');
 
@@ -611,7 +612,7 @@ function ChatView({ messages, onSend }) {
   const [value, setValue] = useState("");
   const areaRef = useRef(null);
   const taRef = useRef(null);
-
+  
   useEffect(() => {
     if (areaRef.current) areaRef.current.scrollTop = areaRef.current.scrollHeight;
   }, [messages]);
@@ -673,6 +674,12 @@ export default function PurplexDashboard() {
   const [mode, setMode] = useState("Search");
   const nextId = useRef(100);
   const searchTimers = useRef([]);
+  const {user} = useSelector(state => state.auth);
+  const chat = useChat();
+
+  useEffect(() => {
+ chat.initializeSocketConnection();
+  },[])
 
   useEffect(() => {
     const id = "purplex-dash-css-v4";
