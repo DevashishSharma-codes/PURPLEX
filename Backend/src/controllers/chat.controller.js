@@ -2,20 +2,38 @@ import { generateResponse, generateChatTitle } from "../services/ai.service.js";
 import chatModel from "../models/chat.model.js";
 import messageModel from "../models/message.model.js";
 
-
 export const sendMessage = async (req, res) => {
-  const { message, chat: chatId } = req.body;
+  // FIX 1: read "chatId" (what the frontend actually sends),
+  // not "chat" (what the old destructure expected)
+  const { message, chatId } = req.body;
 
-  let chat = null, title = null;
+  let chat = null;
+
   if (!chatId) {
-    title = await generateChatTitle(message);
+    // No existing chat — create a new one
+    const title = await generateChatTitle(message);
     chat = await chatModel.create({
       user: req.user.id,
-      title: title,
+      title,
     });
+  } else {
+    // FIX 2: load the existing chat so we can return it in the response.
+    // Previously `chat` stayed null for follow-ups, so the frontend received
+    // chat: null and could never read chat._id → created a phantom sidebar entry.
+    chat = await chatModel.findOne({
+      _id: chatId,
+      user: req.user.id,
+    });
+
+    if (!chat) {
+      return res.status(404).json({
+        success: false,
+        message: "Chat not found",
+      });
+    }
   }
 
-  const resolvedChatId = chatId || chat._id; // ✅ resolve once, use everywhere
+  const resolvedChatId = chat._id;
 
   const userMessage = await messageModel.create({
     chat: resolvedChatId,
@@ -33,10 +51,11 @@ export const sendMessage = async (req, res) => {
     role: "ai",
   });
 
+  // Always return the full chat object so the frontend can read chat._id
   return res.status(200).json({
     success: true,
-    title: title,
-    chat: chat,
+    title: chat.title,
+    chat,
     message: aiMessage,
   });
 };
@@ -57,7 +76,7 @@ export const getMessages = async (req, res) => {
     user: req.user.id,
   });
 
-  if(!chat) {
+  if (!chat) {
     return res.status(404).json({
       success: false,
       message: "Chat not found",
