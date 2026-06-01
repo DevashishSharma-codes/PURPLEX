@@ -19,6 +19,7 @@ html, body { height: 100%; overflow: hidden; }
   --dash: rgba(15,13,11,0.16);
   --accent: #c8501a; --accent-soft: rgba(200,80,26,0.07); --accent-border: rgba(200,80,26,0.2);
   --hatch-color: rgba(15,13,11,0.13); --hatch-size: 12px;
+  --sidebar-w: 236px;
 }
 .px-root {
   background-color: var(--paper);
@@ -34,7 +35,7 @@ html, body { height: 100%; overflow: hidden; }
 
 /* ── SIDEBAR ── */
 .px-sidebar {
-  width: 236px; flex-shrink: 0;
+  width: var(--sidebar-w); flex-shrink: 0;
   background: rgba(242,236,224,0.92); border-right: 1px dashed var(--dash);
   display: flex; flex-direction: column; height: 100%; overflow: hidden;
   position: relative; z-index: 10;
@@ -153,42 +154,71 @@ html, body { height: 100%; overflow: hidden; }
 }
 .px-topbar-icon-btn:hover { background: rgba(15,13,11,0.05); color: var(--ink2); }
 
-/* ── HERO SCREEN ── */
-.px-hero-screen { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; overflow: hidden; position: relative; }
-.px-hero-rails { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+/* ── HERO SCREEN ──
+   Key fixes:
+   1. overflow: hidden + padding-bottom so composer never clips the bottom border
+   2. justify-content: center so content is vertically centred in the available space
+   3. Removed absolute-positioned rail/hline decorations that caused z-index overlap
+   4. Removed px-hero-eyebrow (v1.0 badge) — space reclaimed for title breathing room
+   5. Hero title clamped tighter so it never overflows on ~1200px laptop viewports
+   6. px-composer-frame no longer uses position:relative z-index game with rails
+*/
+.px-hero-screen {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 2.5rem 1rem 2.5rem;
+  position: relative;
+}
+.px-hero-screen::-webkit-scrollbar { width: 2px; }
+.px-hero-screen::-webkit-scrollbar-thumb { background: var(--dash); border-radius: 2px; }
+
+/* Decorative side rails — kept but as non-overflow elements */
+.px-hero-rails {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  overflow: hidden;
+}
 .px-rail {
   position: absolute; top: 0; bottom: 0; width: 1px;
   background: linear-gradient(180deg, rgba(200,80,26,0.4) 0%, rgba(200,80,26,0.08) 20%, rgba(15,13,11,0.06) 50%, transparent 100%);
 }
-.px-rail-l { left: 72px; }
-.px-rail-r { right: 72px; }
-.px-hero-hline2 { position: absolute; left: 72px; right: 72px; bottom: 80px; height: 1px; background: var(--dash); pointer-events: none; z-index: 1; }
+.px-rail-l { left: 56px; }
+.px-rail-r { right: 56px; }
+
 .px-hero-section {
-  position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;
-  padding-top: 44px; text-align: center; animation: fadeUp 0.75s ease both;
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+  animation: fadeUp 0.75s ease both;
+  width: 100%;
+  max-width: 780px;
 }
-.px-hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 7px; border: 1px dashed var(--dash);
-  padding: 0.25rem 0.85rem; font-size: 0.65rem; font-weight: 400; letter-spacing: 0.07em;
-  text-transform: uppercase; color: var(--ink3); font-family: "Geist", sans-serif;
-  margin-bottom: 1.4rem; background: rgba(242,236,224,0.6);
-}
-.px-eyebrow-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: bpulse 2s infinite; }
 .px-hero-title {
-  font-family: "Libre Baskerville", serif; font-size: clamp(2.8rem, 5vw, 4.6rem);
-  font-weight: 400; line-height: 1.05; letter-spacing: -0.03em; color: var(--ink);
+  font-family: "Libre Baskerville", serif;
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  font-weight: 400; line-height: 1.08; letter-spacing: -0.03em; color: var(--ink);
 }
 .px-hero-title em { font-style: italic; color: var(--ink3); }
 .px-hero-sub {
-  margin-top: 1.1rem; max-width: 500px; color: var(--ink3); font-size: 0.9rem;
-  font-family: "Geist", sans-serif; font-weight: 300; line-height: 1.75;
+  margin-top: 0.9rem;
+  max-width: 480px; color: var(--ink3); font-size: 0.875rem;
+  font-family: "Geist", sans-serif; font-weight: 300; line-height: 1.7;
   padding: 0 1rem; animation: fadeUp 0.75s ease 0.15s both;
 }
 
 /* ── COMPOSER FRAME (hero) ── */
 .px-composer-frame {
-  position: relative; z-index: 3; width: min(100% - 144px, 760px); margin: 2.5rem auto 0;
-  animation: fadeUp 0.75s ease 0.3s both; border: 1px dashed var(--dash); padding: 1px; background: var(--paper2);
+  position: relative; z-index: 3;
+  width: min(100%, 720px);
+  margin: 1.75rem 0 0;
+  animation: fadeUp 0.75s ease 0.3s both;
+  border: 1px dashed var(--dash); padding: 1px; background: var(--paper2);
+  flex-shrink: 0;
 }
 .px-composer-frame::before {
   content: ""; position: absolute; inset: 6px; border: 1px dashed rgba(15,13,11,0.08);
@@ -203,8 +233,8 @@ html, body { height: 100%; overflow: hidden; }
 .px-frame-body { background: var(--paper2); position: relative; z-index: 1; }
 .px-stage-textarea {
   display: block; width: 100%; resize: none; outline: none; border: none;
-  background: transparent; color: var(--ink2); padding: 1.2rem 1.4rem 0.8rem;
-  font-family: "Geist", monospace; font-size: 0.82rem; line-height: 1.75; height: 126px;
+  background: transparent; color: var(--ink2); padding: 1rem 1.4rem 0.75rem;
+  font-family: "Geist", monospace; font-size: 0.82rem; line-height: 1.75; height: 110px;
 }
 .px-stage-textarea::placeholder { color: var(--ink3); opacity: 0.55; }
 .px-frame-footer {
@@ -227,7 +257,9 @@ html, body { height: 100%; overflow: hidden; }
 .px-frame-send:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ── MESSAGES ── */
-.px-chat-view { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.px-chat-view {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
+}
 .px-chat-area {
   flex: 1; min-height: 0; overflow-y: auto; padding: 2rem 0;
   display: flex; flex-direction: column; align-items: center;
@@ -306,7 +338,10 @@ html, body { height: 100%; overflow: hidden; }
 .px-search-source-fav { width: 10px; height: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.42rem; font-weight: 700; color: #fff; }
 
 /* ── CHAT COMPOSER ── */
-.px-chat-composer { flex-shrink: 0; border-top: 1px dashed var(--dash); background: rgba(242,236,224,0.92); padding: 0.85rem 1.5rem 1rem; }
+.px-chat-composer {
+  flex-shrink: 0; border-top: 1px dashed var(--dash);
+  background: rgba(242,236,224,0.92); padding: 0.85rem 1.5rem 1rem;
+}
 .px-chat-composer-inner { max-width: 660px; margin: 0 auto; }
 .px-chat-composer-box { border: 1px dashed var(--dash); background: var(--paper2); position: relative; }
 .px-chat-composer-box::before { content: ""; position: absolute; inset: 5px; border: 1px dashed rgba(15,13,11,0.07); pointer-events: none; }
@@ -318,7 +353,10 @@ html, body { height: 100%; overflow: hidden; }
   min-height: 68px; max-height: 150px;
 }
 .px-chat-textarea::placeholder { color: var(--ink3); opacity: 0.6; }
-.px-chat-composer-footer { display: flex; align-items: center; gap: 8px; padding: 0.4rem 0.75rem; border-top: 1px dashed var(--dash); background: var(--paper3); }
+.px-chat-composer-footer {
+  display: flex; align-items: center; gap: 8px; padding: 0.4rem 0.75rem;
+  border-top: 1px dashed var(--dash); background: var(--paper3);
+}
 .px-cc-tag { display: flex; align-items: center; gap: 5px; padding: 0.2rem 0.55rem; border: 1px dashed var(--dash); cursor: pointer; color: var(--ink3); font-family: "Geist", monospace; font-size: 0.6rem; transition: border-color 0.15s, color 0.15s; white-space: nowrap; }
 .px-cc-tag:hover { border-color: rgba(15,13,11,0.35); color: var(--ink2); }
 .px-cc-send { margin-left: auto; display: flex; align-items: center; gap: 6px; flex-shrink: 0; padding: 0.3rem 0.85rem; border: none; background: var(--accent); cursor: pointer; color: #fff; font-family: "Geist", sans-serif; font-size: 0.68rem; font-weight: 500; transition: background 0.15s; white-space: nowrap; }
@@ -592,6 +630,7 @@ function Message({ role, text, sources, searching, searchPhase, error, streaming
 
 // ─────────────────────────────────────────
 // HERO SCREEN
+// v1.0 eyebrow badge REMOVED — space now used for better vertical rhythm
 // ─────────────────────────────────────────
 function HeroScreen({ onSend, disabled }) {
   const [value, setValue] = useState("");
@@ -601,14 +640,15 @@ function HeroScreen({ onSend, disabled }) {
   return (
     <div className="px-hero-screen">
       <div className="px-hero-rails" aria-hidden="true">
-        <div className="px-rail px-rail-l"/><div className="px-rail px-rail-r"/>
-        <div className="px-hero-hline2"/>
+        <div className="px-rail px-rail-l"/>
+        <div className="px-rail px-rail-r"/>
       </div>
+
       <section className="px-hero-section">
-        <div className="px-hero-eyebrow"><span className="px-eyebrow-dot"/>v1.0 — now in public beta</div>
         <h1 className="px-hero-title">search that<br/><em>reasons,</em> not retrieves.</h1>
-        <p className="px-hero-sub">Purplex reads the live web, thinks through it, and gives you one answer you can trust.<br/>No ten blue links. One cited answer.</p>
+        <p className="px-hero-sub">Purplex reads the live web, thinks through it, and gives you one answer you can trust. No ten blue links. One cited answer.</p>
       </section>
+
       <div className="px-composer-frame">
         <div className="px-mac-bar">
           <span className="px-mac-dot" style={{ background: "#ff5f57" }}/>
@@ -617,7 +657,15 @@ function HeroScreen({ onSend, disabled }) {
           <span className="px-mac-filename">purplex / search.query.tsx</span>
         </div>
         <div className="px-frame-body">
-          <textarea className="px-stage-textarea" spellCheck={false} placeholder={placeholder} value={value} onChange={e => setValue(e.target.value)} onKeyDown={handleKey} disabled={disabled}/>
+          <textarea
+            className="px-stage-textarea"
+            spellCheck={false}
+            placeholder={placeholder}
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            onKeyDown={handleKey}
+            disabled={disabled}
+          />
           <div className="px-frame-footer">
             <div className="px-frame-tag"><Ic.Nodes/> /web-search</div>
             <div className="px-frame-tag"><Ic.Attach/> attach</div>
@@ -670,7 +718,16 @@ function ChatView({ messages, onSend, disabled }) {
         <div className="px-chat-composer-inner">
           <div className="px-chat-composer-box">
             <div className="px-chat-composer-dark">
-              <textarea ref={taRef} className="px-chat-textarea" placeholder="$ ask — search the live web for anything…" value={value} onChange={e => { setValue(e.target.value); autoResize(e.target); }} onKeyDown={handleKey} spellCheck={false} disabled={disabled}/>
+              <textarea
+                ref={taRef}
+                className="px-chat-textarea"
+                placeholder="$ ask — search the live web for anything…"
+                value={value}
+                onChange={e => { setValue(e.target.value); autoResize(e.target); }}
+                onKeyDown={handleKey}
+                spellCheck={false}
+                disabled={disabled}
+              />
               <div className="px-chat-composer-footer">
                 <div className="px-cc-tag"><Ic.Nodes/> /web-search</div>
                 <div className="px-cc-tag"><Ic.Attach/> attach</div>
@@ -716,21 +773,7 @@ export default function PurplexDashboard() {
   const [fetchingChats,    setFetchingChats]    = useState(false);
   const [isHero,           setIsHero]           = useState(!currentChatId);
 
-  // ─────────────────────────────────────────────────────────────────────
-  // activeChatIdRef — the single synchronous source of truth for the
-  // currently-open chat id.
-  //
-  // FIX: This ref is now updated in TWO ways:
-  //   1. Synchronously at the TOP of handleSend (before any await), carrying
-  //      the current value forward into the async closure.
-  //   2. Synchronously BEFORE any dispatch inside handleSend, so React's
-  //      effect flush triggered by the dispatch cannot race against it.
-  //
-  // The sync effect below (`useEffect([currentChatId])`) is now guarded
-  // by isSendingRef so it cannot overwrite the ref while a send is live.
-  // ─────────────────────────────────────────────────────────────────────
   const activeChatIdRef = useRef(currentChatId);
-
   const isSendingRef    = useRef(false);
   const searchTimers    = useRef([]);
   const ANIM_MIN_MS     = 2000;
@@ -740,7 +783,7 @@ export default function PurplexDashboard() {
 
   // ── Inject CSS ──────────────────────────────────────────────────────
   useEffect(() => {
-    const id = "purplex-css-v11";
+    const id = "purplex-css-v12";
     if (!document.getElementById(id)) {
       const s = document.createElement("style");
       s.id = id; s.textContent = GLOBAL_CSS;
@@ -749,12 +792,8 @@ export default function PurplexDashboard() {
     return () => { document.getElementById(id)?.remove(); searchTimers.current.forEach(clearTimeout); };
   }, []);
 
-  // ── Sync isHero + activeChatIdRef when Redux currentChatId changes ──
-  // GUARD: skip this sync while a send is in progress so the ref is not
-  // overwritten by a Redux-triggered re-render racing against handleSend.
   useEffect(() => {
-    if (isSendingRef.current) return;   // ← KEY FIX: don't clobber ref mid-send
-
+    if (isSendingRef.current) return;
     if (currentChatId) {
       activeChatIdRef.current = currentChatId;
       setIsHero(false);
@@ -772,7 +811,6 @@ export default function PurplexDashboard() {
       try {
         const raw      = await getChats();
         const chatList = normaliseChatList(raw);
-
         const serverMap = {};
         chatList.forEach(c => {
           serverMap[c._id] = {
@@ -781,8 +819,6 @@ export default function PurplexDashboard() {
             lastUpdated: c.updatedAt || c.createdAt || null,
           };
         });
-
-        // Merge: keep client-side messages/data, update server title/timestamp
         const existing = chatsRef.current;
         const merged   = { ...serverMap };
         Object.keys(existing).forEach(id => {
@@ -792,7 +828,6 @@ export default function PurplexDashboard() {
             merged[id] = existing[id];
           }
         });
-
         dispatch(setChats(merged));
       } catch (err) {
         console.error("getChats failed:", err);
@@ -803,13 +838,10 @@ export default function PurplexDashboard() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Load messages when currentChatId changes (sidebar click) ────────
+  // ── Load messages when currentChatId changes ────────────────────────
   useEffect(() => {
     if (!currentChatId) { setUiMessages([]); return; }
-
-    // Don't overwrite optimistic messages while a send is in progress
     if (isSendingRef.current) return;
-
     const existing = chatsRef.current[currentChatId]?.messages;
     if (existing?.length) {
       setUiMessages(existing.map(m => ({
@@ -819,7 +851,6 @@ export default function PurplexDashboard() {
       })));
       return;
     }
-
     (async () => {
       setFetchingMessages(true);
       try {
@@ -848,26 +879,14 @@ export default function PurplexDashboard() {
   const handleSend = useCallback(async (text) => {
     searchTimers.current.forEach(clearTimeout);
     searchTimers.current = [];
-
-    // Capture synchronously — before any await or dispatch
     const sendingToChatId = activeChatIdRef.current;
-    console.log("[Dashboard] handleSend — activeChatIdRef:", sendingToChatId);
-
-    // ── FIX: raise the flag BEFORE the first dispatch/setState so that
-    // the currentChatId sync effect (above) is already blocked when React
-    // flushes the optimistic state updates below.
     isSendingRef.current = true;
-
     setIsHero(false);
-
-    // Optimistic bubbles
     setUiMessages(prev => [
       ...prev,
       { role: "user",      text,     sources: [] },
       { role: "assistant", text: "", sources: [], searching: true, searchPhase: 0 },
     ]);
-
-    // Animate search phases
     [0, 1, 2, 3].forEach((ph, i) => {
       const t = setTimeout(() => {
         setUiMessages(prev => {
@@ -878,63 +897,36 @@ export default function PurplexDashboard() {
       }, i * 520);
       searchTimers.current.push(t);
     });
-
     const animMinPromise = new Promise(res => setTimeout(res, ANIM_MIN_MS));
-
-    // Wrap everything in a try/finally so isSendingRef is ALWAYS cleared,
-    // even if an unexpected exception escapes the inner try/catch.
     try {
       let result;
       try {
-        // Run the API call and the minimum animation timer in parallel.
-        // If handleSendMessage throws, the error is caught below and shown
-        // as an error bubble — the UI never stays stuck.
         [result] = await Promise.all([
-          handleSendMessage({
-            message: text,
-            chatId:  sendingToChatId || undefined,
-          }),
+          handleSendMessage({ message: text, chatId: sendingToChatId || undefined }),
           animMinPromise,
         ]);
       } catch (apiErr) {
-        // ── API / normalisation error ─────────────────────────────────
-        // Show a visible error bubble so the user knows what happened.
-        // The error message from useChat includes the backend key list,
-        // making it easy to diagnose shape mismatches in the console.
         console.error("[Dashboard] API call failed:", apiErr);
         searchTimers.current.forEach(clearTimeout);
         searchTimers.current = [];
         setUiMessages(prev =>
           prev.map(m =>
             m.searching
-              ? {
-                  role: "assistant",
-                  text: "",
-                  searching: false,
+              ? { role: "assistant", text: "", searching: false,
                   error: apiErr?.message?.includes("chat._id")
                     ? "Server response is missing expected fields — check the browser console for details."
-                    : "Failed to get a response. Please try again.",
-                }
+                    : "Failed to get a response. Please try again." }
               : m
           )
         );
-        return; // finally block will still run and clear isSendingRef
+        return;
       }
-
       const newChatId = result?.chat?._id;
       const aiContent = result?.aiContent ?? "";
-
-      // Update ref BEFORE any dispatch so React's effect flush can't race
       if (newChatId) {
-        console.log("[Dashboard] updating activeChatIdRef →", newChatId);
         activeChatIdRef.current = newChatId;
       }
-
-      // ── Empty response guard ──────────────────────────────────────────
-      // If aiContent is empty (backend returned nothing), show a fallback
-      // message rather than silently showing a blank bubble forever.
       if (!aiContent) {
-        console.warn("[Dashboard] aiContent is empty — showing fallback.");
         setUiMessages(prev =>
           prev.map(m =>
             m.searching
@@ -942,17 +934,13 @@ export default function PurplexDashboard() {
               : m
           )
         );
-        return; // finally block clears isSendingRef
+        return;
       }
-
-      // Switch searching bubble → streaming
       setUiMessages(prev => {
         const u = [...prev], li = u.length - 1;
         if (u[li]?.searching) u[li] = { role: "assistant", text: "", sources: [], streaming: true };
         return u;
       });
-
-      // Stream character by character
       const CHUNK = 6, TICK = 18;
       let pos = 0;
       function streamNext() {
@@ -975,31 +963,15 @@ export default function PurplexDashboard() {
         searchTimers.current.push(t);
       }
       streamNext();
-
     } finally {
-      // Guarantee the sending flag is always cleared, even on unexpected throws.
-      // streamNext() clears it itself when streaming finishes, so we only force-
-      // clear here if streaming never started (i.e. we returned early above).
-      // We use a short delay so streamNext() wins if it's mid-flight.
       setTimeout(() => {
-        // If streaming is still going, streamNext handles it — don't interrupt.
-        // If we returned early (error / empty), this clears the stuck flag.
-        const lastMsg = (() => {
-          // Can't read state here; use a ref snapshot instead.
-          return null; // intentional — we just unconditionally clear after errors/returns
-        })();
-        void lastMsg; // suppress lint
-        // Only force-clear if we're NOT in the middle of streaming
-        // (streamNext sets isSendingRef = false itself when done)
         if (isSendingRef.current) {
-          // Check if any streaming message is still live; if not, clear.
           isSendingRef.current = false;
         }
       }, ANIM_MIN_MS + 100);
     }
   }, [handleSendMessage]);
 
-  // ── New chat ────────────────────────────────────────────────────────
   function newChat() {
     dispatch(setCurrentChatId(null));
     activeChatIdRef.current = null;
@@ -1009,7 +981,6 @@ export default function PurplexDashboard() {
     searchTimers.current.forEach(clearTimeout);
   }
 
-  // ── Select existing chat ────────────────────────────────────────────
   function selectChat(chatId) {
     if (chatId === currentChatIdRef.current && !isHero) return;
     activeChatIdRef.current = chatId;
@@ -1017,7 +988,6 @@ export default function PurplexDashboard() {
     setIsHero(false);
   }
 
-  // ── Delete chat ─────────────────────────────────────────────────────
   async function handleDeleteChat(e, chatId) {
     e.stopPropagation();
     try {
