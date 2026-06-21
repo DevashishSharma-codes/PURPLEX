@@ -9,7 +9,7 @@ export const searchInternet = async ({ query }) => {
     const month = now.toLocaleString("en-US", { month: "long" });
     const day = now.getDate();
 
-    // Append current year to query so Tavily doesn't surface old results
+
     const enrichedQuery = `${query} ${year}`;
 
     const response = await tvly.search(enrichedQuery, {
