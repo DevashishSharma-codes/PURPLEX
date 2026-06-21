@@ -22,13 +22,15 @@ export const register = async (req, res) => {
       { expiresIn: "7d" }
     );
 
+    const backendUrl = `${req.protocol}://${req.get("host")}`;
+
     await sendEmail(
       user.email,
       "Welcome to Purplex",
       `<p>Hi ${user.username},</p>
     <p>Thank you for registering at <b>Purplex</b> <br/> We're excited to have you on board.</p>
     <p>Click the link below to verify your email:</p>
-    <a href="http://localhost:3000/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
+    <a href="${backendUrl}/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
    <p>Best regards,<br>The Purplex Team</p>`,
       `Hi ${user.username}, Thank you for registering at Purplex! We're excited to have you on board.`
     );
@@ -124,13 +126,14 @@ export const login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
-   res.cookie("token", token, {
-  httpOnly: true,
-  secure: false,
-  sameSite: "lax",
-  domain: "localhost",
-  maxAge: 7 * 24 * 60 * 60 * 1000
-});
+    const isProduction = process.env.NODE_ENV === "production";
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      ...(isProduction ? {} : { domain: "localhost" }),
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
     return res.status(200).json({
       success: true,
       message: "Logged in successfully",  
