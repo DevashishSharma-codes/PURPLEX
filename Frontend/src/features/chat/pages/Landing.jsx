@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const GLOBAL_CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Geist:wght@300;400;500;600&display=swap');
@@ -518,10 +520,18 @@ const DOCS_NAV = [
 const MQ_ITEMS = ["Live web retrieval","Deep reasoning mode","Cited sources","Streaming answers","SOC 2 Type II","One-line API","No data logging"];
 
 export default function Purplex() {
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.user);
   const [openNav, setOpenNav] = useState(null);
   const [annual, setAnnual] = useState(true);
   const [docsActive, setDocsActive] = useState("Quick Start");
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     if (!document.getElementById("px-css")) {
@@ -557,8 +567,8 @@ export default function Purplex() {
           </li>
         </ul>
         <div className="px-nav-right">
-          <button className="px-btn-ghost-nav">Sign in</button>
-          <button className="px-btn-nav">Get started →</button>
+          <button className="px-btn-ghost-nav" onClick={() => navigate("/login")}>Sign in</button>
+          <button className="px-btn-nav" onClick={() => navigate("/register")}>Get started →</button>
         </div>
       </nav>
 
@@ -570,7 +580,7 @@ export default function Purplex() {
             <h1 className="px-h1">search that<br/><em>reasons,</em> not retrieves.</h1>
             <p className="px-hero-p">Purplex doesn't hand you ten blue links. It reads the web, thinks through it, and gives you one answer you can trust.</p>
             <div className="px-hero-btns">
-              <button className="px-btn-cta">Try Purplex free</button>
+              <button className="px-btn-cta" onClick={() => navigate("/register")}>Try Purplex free</button>
               <button className="px-btn-ghost2" onClick={()=>scrollTo("features")}>See how it works →</button>
             </div>
           </div>
@@ -666,7 +676,7 @@ export default function Purplex() {
                   <div className="px-plan-desc">{plan.desc}</div>
                   <hr className="px-plan-divider"/>
                   <ul className="px-plan-features">{plan.features.map((f,fi)=><li key={fi}><span className="px-feat-check">✓</span>{f}</li>)}</ul>
-                  <button className="px-plan-btn">{plan.btn}</button>
+                  <button className="px-plan-btn" onClick={() => navigate(plan.name === "Team" ? "/login" : "/register")}>{plan.btn}</button>
                 </div>
               ))}
             </div>
@@ -759,7 +769,7 @@ export default function Purplex() {
             <div className="px-cta-l"><h2>stop searching.<br/><em>start knowing.</em></h2></div>
             <div className="px-cta-r">
               <p>Purplex is free to start. No credit card. No setup. Drop one component and you're shipping AI-powered search in minutes.</p>
-              <div className="px-cta-acts"><button className="px-btn-ac">Start for free</button><button className="px-btn-ol" onClick={()=>scrollTo("docs")}>Read the docs</button></div>
+              <div className="px-cta-acts"><button className="px-btn-ac" onClick={() => navigate("/register")}>Start for free</button><button className="px-btn-ol" onClick={()=>scrollTo("docs")}>Read the docs</button></div>
             </div>
           </div>
         </div>
